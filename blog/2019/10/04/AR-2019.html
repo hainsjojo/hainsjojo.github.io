@@ -98,17 +98,17 @@ H3YTH3R3P33P5@ARSECFOR2019
 
 <p>We are given a html file which opens to look like this.</p>
 
-<p><img src="/assets/img/AR/html_p.PNG" alt="" /></p>
+<p><img src="/blog/assets/img/AR/html_p.PNG" alt="" /></p>
 
 <p>Looking at the source of the file.</p>
 
-<p><img src="/assets/img/AR/html_2.PNG" alt="" /></p>
+<p><img src="/blog/assets/img/AR/html_2.PNG" alt="" /></p>
 
 <p>we get the string <code class="highlighter-rouge">NB2HI4DTHIXS62LNM52XELTDN5WS6NKKGJCG4OBS</code>.</p>
 
 <p>Since the heading of the html file was <code class="highlighter-rouge">BeepBeep32One</code> we try to decode it using <code class="highlighter-rouge">base32</code>.</p>
 
-<p><img src="/assets/img/AR/html_3.PNG" alt="" /></p>
+<p><img src="/blog/assets/img/AR/html_3.PNG" alt="" /></p>
 
 <p>We get an image url, going to this url we find the flag.</p>
 
@@ -120,11 +120,11 @@ H3YTH3R3P33P5@ARSECFOR2019
 
 <p>Opening both the files in Audacity, we get this.</p>
 
-<p><img src="/assets/img/AR/audio1.PNG" alt="" /></p>
+<p><img src="/blog/assets/img/AR/audio1.PNG" alt="" /></p>
 
 <p>Listening to the sound, it is almost inaudiable, so we decided to view the spectogram of these files.</p>
 
-<p><img src="/assets/img/AR/audio2.PNG" alt="" /></p>
+<p><img src="/blog/assets/img/AR/audio2.PNG" alt="" /></p>
 
 <p>First file <code class="highlighter-rouge">araudiosteg1</code> gives this:</p>
 <blockquote>
@@ -149,7 +149,7 @@ DECIMAL       HEXADECIMAL     DESCRIPTION
 </code></pre></div></div>
 <p>We see that there is a hidden JPEG image in it. We extracted this image using <code class="highlighter-rouge">foremost</code>.</p>
 
-<p><img src="/assets/img/AR/shutter.jpg" alt="" /></p>
+<p><img src="/blog/assets/img/AR/shutter.jpg" alt="" /></p>
 
 <p>We extracted the hidden text using <code class="highlighter-rouge">steghide</code> and password as <code class="highlighter-rouge">listen</code>.</p>
 
@@ -165,11 +165,11 @@ DECIMAL       HEXADECIMAL     DESCRIPTION
 <p>For this challenge we are given a pcapng file.
 Opening the file with wireshark, we can see all the packets, sorting it by <code class="highlighter-rouge">http</code> we see this.</p>
 
-<p><img src="/assets/img/AR/pcap1.PNG" alt="" /></p>
+<p><img src="/blog/assets/img/AR/pcap1.PNG" alt="" /></p>
 
 <p>We can already see the flag in the first packet, vewing the TCP stream</p>
 
-<p><img src="/assets/img/AR/pcap2.PNG" alt="" /></p>
+<p><img src="/blog/assets/img/AR/pcap2.PNG" alt="" /></p>
 
 <p>Flag is there in the GET parameter.</p>
 
@@ -222,15 +222,15 @@ DECIMAL       HEXADECIMAL     DESCRIPTION
 
 <p>Going through the files, we have this.</p>
 
-<p><img src="/assets/img/AR/lonley.jpg" alt="" /></p>
+<p><img src="/blog/assets/img/AR/lonley.jpg" alt="" /></p>
 
 <h1 id="murder-on-the-orient-express">Murder on the Orient Express</h1>
 
 <p>We are given two jpeg files <code class="highlighter-rouge">Ready.jpeg</code> &amp; <code class="highlighter-rouge">Steady.jpeg</code></p>
 
-<p><img src="/assets/img/AR/Ready.jpeg" alt="" /></p>
+<p><img src="/blog/assets/img/AR/Ready.jpeg" alt="" /></p>
 
-<p><img src="/assets/img/AR/Steady.jpeg" alt="" /></p>
+<p><img src="/blog/assets/img/AR/Steady.jpeg" alt="" /></p>
 
 <p>Running <code class="highlighter-rouge">binwalk</code> on Ready.jpeg we get this</p>
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>DECIMAL       HEXADECIMAL     DESCRIPTION
@@ -254,7 +254,7 @@ DECIMAL       HEXADECIMAL     DESCRIPTION
 
 <p>Analysing more we find that its a docx file, Opening it in word gives this.</p>
 
-<p><img src="/assets/img/AR/doc1.PNG" alt="" /></p>
+<p><img src="/blog/assets/img/AR/doc1.PNG" alt="" /></p>
 
 <p>Even though it looks like a flag, it is not. It says that is a password for the next file.</p>
 
@@ -274,13 +274,13 @@ DECIMAL       HEXADECIMAL     DESCRIPTION
 
 <p>Opening the archive we see that its Password Protected.</p>
 
-<p><img src="/assets/img/AR/doc2.PNG" alt="" /></p>
+<p><img src="/blog/assets/img/AR/doc2.PNG" alt="" /></p>
 
 <p>Using <code class="highlighter-rouge">AR-FRC@ARSECFOR2019</code> doesn’t seem to work, so using just <code class="highlighter-rouge">AR-FRC</code> extracted these files successfully.</p>
 
 <p>Opening the pdf file we have the flag.</p>
 
-<p><img src="/assets/img/AR/doc3.PNG" alt="" /></p>
+<p><img src="/blog/assets/img/AR/doc3.PNG" alt="" /></p>
 
 <p>Flag :<code class="highlighter-rouge">1Nv3$71G@710N_$7@r7@ARSECFOR2019</code></p>
 
@@ -292,7 +292,7 @@ huehue.raw: RFC 822 mail, ASCII text, with very long lines
 </code></pre></div></div>
 <p>Opening this is hex editor we see this</p>
 
-<p><img src="/assets/img/AR/b1.PNG" alt="" /></p>
+<p><img src="/blog/assets/img/AR/b1.PNG" alt="" /></p>
 
 <p>We see a file <code class="highlighter-rouge">hah</code> with base64 encoded contents, we can manually decode this.</p>
 
@@ -304,7 +304,7 @@ huehue.raw: RFC 822 mail, ASCII text, with very long lines
 
 <p>We get a zip file, extracting the zip file we get the flag.</p>
 
-<p><img src="/assets/img/AR/flag.jpeg" alt="" /></p>
+<p><img src="/blog/assets/img/AR/flag.jpeg" alt="" /></p>
 
 
 </div>
