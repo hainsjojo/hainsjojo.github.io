@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Augmented Reality Security &amp; Forensic Competition 2019 | jojo</title>
+<meta name="generator" content="Jekyll v3.8.6" />
+<meta property="og:title" content="Augmented Reality Security &amp; Forensic Competition 2019" />
+<meta name="author" content="Hains Jojo" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="My solutions for AR competition 2019 help in Asia Pacific Uiversity." />
+<meta property="og:description" content="My solutions for AR competition 2019 help in Asia Pacific Uiversity." />
+<link rel="canonical" href="http://localhost:4000/blog/2019/10/04/AR-2019.html" />
+<meta property="og:url" content="http://localhost:4000/blog/2019/10/04/AR-2019.html" />
+<meta property="og:site_name" content="jojo" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-10-04T00:00:00-04:00" />
+<script type="application/ld+json">
+{"description":"My solutions for AR competition 2019 help in Asia Pacific Uiversity.","headline":"Augmented Reality Security &amp; Forensic Competition 2019","dateModified":"2019-10-04T00:00:00-04:00","datePublished":"2019-10-04T00:00:00-04:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/blog/2019/10/04/AR-2019.html"},"url":"http://localhost:4000/blog/2019/10/04/AR-2019.html","author":{"@type":"Person","name":"Hains Jojo"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css">
+  <link rel="icon" type="image/png" href="/blog/assets/favicon.png" /><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/blog/feed.xml" title="jojo" /><script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+</head>
+<body><div class="site-header">
+  <div class="wrapper">
+    <a class="site-title" rel="author" href="/blog/">jojo<b class="command_prompt"></b><b class="blinking_cursor">_</b></a>
+    <span class="social_links">
+        <a class="color-cyan-hover" href="https://twitter.com/hainsjojo"><i class="fab fa-twitter-square"></i></a><a class="color-red-hover" href="https://hainsjojo.github.io"><i class="fab fa-itch-io"></i></a><a class="color-purple-hover" href="https://github.com/hainsjojo"><i class="fab fa-github-square"></i></a>
+    </span>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <div class="author-box">
+
+
+</div>
+
+<div class="post">
+  <h1 class="post-title">Augmented Reality Security & Forensic Competition 2019</h1>
+  
+  <div class="post-tags">
+      
+      <a class="tag" href="/tag/Forensic/">Forensic</a>
+      
+  </div>
+  
+  <div class="post-date">Published on 04 Oct 2019</div>
+  
+  <div class="post-description">My solutions for AR competition 2019 help in Asia Pacific Uiversity.</div>
+  
+  <h1 id="line-of-duty">Line Of Duty</h1>
+<p>In this challenge we are given a JPG image of Pablo Escobar. Viewing the metadata doesn’t give us anything interesting.</p>
+
+<p>Running <code class="highlighter-rouge">strings</code> against it we get this.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Z_ie
+{cco6
+on 6
+o`&gt;E
+y4Q@
+FLAG .txt
+FLAG .txt
+~Sz5p
+~Sz5p
+Murder!
+</code></pre></div></div>
+
+<p>We see <code class="highlighter-rouge">FLAG .txt</code> and <code class="highlighter-rouge">Murder!</code>.. this could be a potential password.</p>
+
+<p>Since we saw <code class="highlighter-rouge">FLAG .txt</code> embedded in the JPG, we go through the file using <code class="highlighter-rouge">binwalk</code></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>DECIMAL       HEXADECIMAL     DESCRIPTION
+--------------------------------------------------------------------------------
+0             0x0             JPEG image data, JFIF standard 1.01
+198477        0x3074D         Zip archive data, encrypted at least v2.0 to extract, compressed size: 60, uncompressed size: 32, name: FLAG .txt
+198705        0x30831         End of Zip archive, footer length: 22
+</code></pre></div></div>
+<p>We can extract the Zip archive using <code class="highlighter-rouge">binwalk -e</code> or <code class="highlighter-rouge">foremost</code>.</p>
+
+<p>Extracting the zip file using the password <code class="highlighter-rouge">Murder!</code> we got from <code class="highlighter-rouge">strings</code> we have a text file named <code class="highlighter-rouge">FLAG .txt</code>.</p>
+
+<p>Viewing the contents of the file.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>YOU CANT CATCH ME! "P4BL0#C0BAR"
+</code></pre></div></div>
+<p><code class="highlighter-rouge">P4BL0#C0BAR</code> looks like a potential key.</p>
+
+<p>Now we try to extract contents from the inital JPG using this key.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@c0dbat:~/CTF/ARSEC/Line of Duty/Line of Duty/blog# steghide extract -sf Line\ of\ Duty.jpg -p P4BL0#C0BAR
+wrote extracted data to "steganopayload6903.txt".
+root@c0dbat:~/CTF/ARSEC/Line of Duty/Line of Duty/blog# cat steganopayload6903.txt 
+H3YTH3R3P33P5@ARSECFOR2019
+</code></pre></div></div>
+<p>We have the flag <code class="highlighter-rouge">H3YTH3R3P33P5@ARSECFOR2019</code>.</p>
+
+<h1 id="a-game-of-shadows">A Game Of Shadows</h1>
+
+<p>We are given a html file which opens to look like this.</p>
+
+<p><img src="/assets/img/AR/html_p.PNG" alt="" /></p>
+
+<p>Looking at the source of the file.</p>
+
+<p><img src="/assets/img/AR/html_2.PNG" alt="" /></p>
+
+<p>we get the string <code class="highlighter-rouge">NB2HI4DTHIXS62LNM52XELTDN5WS6NKKGJCG4OBS</code>.</p>
+
+<p>Since the heading of the html file was <code class="highlighter-rouge">BeepBeep32One</code> we try to decode it using <code class="highlighter-rouge">base32</code>.</p>
+
+<p><img src="/assets/img/AR/html_3.PNG" alt="" /></p>
+
+<p>We get an image url, going to this url we find the flag.</p>
+
+<p><img src="https://imgur.com/5J2Dn82" alt="" /></p>
+
+<h1 id="shutter-island">Shutter Island</h1>
+
+<p>This challenge is based on Audio Steganography.. We are given 2 audio files named <code class="highlighter-rouge">araudiosteg1</code> &amp; <code class="highlighter-rouge">araudiosteg2</code>.</p>
+
+<p>Opening both the files in Audacity, we get this.</p>
+
+<p><img src="/assets/img/AR/audio1.PNG" alt="" /></p>
+
+<p>Listening to the sound, it is almost inaudiable, so we decided to view the spectogram of these files.</p>
+
+<p><img src="/assets/img/AR/audio2.PNG" alt="" /></p>
+
+<p>First file <code class="highlighter-rouge">araudiosteg1</code> gives this:</p>
+<blockquote>
+  <p>Remember this “listen”</p>
+</blockquote>
+
+<p>Second file <code class="highlighter-rouge">araudiosteg2</code> gives this:</p>
+<blockquote>
+  <p>look closer</p>
+</blockquote>
+
+<p><code class="highlighter-rouge">listen</code> could be a potential password but where do we use it?</p>
+
+<p>Running binwalk on the second audio file.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+DECIMAL       HEXADECIMAL     DESCRIPTION
+--------------------------------------------------------------------------------
+441188        0x6BB64         JPEG image data, JFIF standard 1.01
+
+
+</code></pre></div></div>
+<p>We see that there is a hidden JPEG image in it. We extracted this image using <code class="highlighter-rouge">foremost</code>.</p>
+
+<p><img src="/assets/img/AR/shutter.jpg" alt="" /></p>
+
+<p>We extracted the hidden text using <code class="highlighter-rouge">steghide</code> and password as <code class="highlighter-rouge">listen</code>.</p>
+
+<p><code class="highlighter-rouge">steghide extract -sf shutter.jpg -p "listen"</code></p>
+
+<p>We get a text file that contains the flag.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>n0w_y0u_s33_me@ARSECFOR2019
+</code></pre></div></div>
+
+<h1 id="criminal-minds">Criminal Minds</h1>
+
+<p>For this challenge we are given a pcapng file.
+Opening the file with wireshark, we can see all the packets, sorting it by <code class="highlighter-rouge">http</code> we see this.</p>
+
+<p><img src="/assets/img/AR/pcap1.PNG" alt="" /></p>
+
+<p>We can already see the flag in the first packet, vewing the TCP stream</p>
+
+<p><img src="/assets/img/AR/pcap2.PNG" alt="" /></p>
+
+<p>Flag is there in the GET parameter.</p>
+
+<p><code class="highlighter-rouge">%40</code> is the url encoded version of <code class="highlighter-rouge">@</code></p>
+
+<p>Changing that we have the flag:
+<code class="highlighter-rouge">y0u_f0und_m3@ARSECFOR2019</code></p>
+
+<h1 id="the-lonely-witness">The Lonely Witness</h1>
+
+<p>We are given a file named <code class="highlighter-rouge">Crack-it.jpeg</code>.
+Viewing the magic numbers we can see that it is definitely not a jpeg file.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@c0dbat:~/CTF/ARSEC/The Lonely Witness/The Lonely Witness# file Crack-it\ .jpeg 
+Crack-it .jpeg: DOS/MBR boot sector MS-MBR,D0S version 3.3-7.0 english at offset 0x8b "Invalid partition table" at offset 0xa3 "Error loading operating system" at offset 0xc2 "Missing operating system", disk signature 0xa0baba; partition 1 : ID=0x6, active, start-CHS (0x0,1,1), end-CHS (0x3ff,1,63), startsector 64, 1966016 sectors
+</code></pre></div></div>
+<p>Viewing the contents using binwalk.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@c0dbat:~/CTF/ARSEC/The Lonely Witness/The Lonely Witness# binwalk Crack-it\ .jpeg 
+
+DECIMAL       HEXADECIMAL     DESCRIPTION
+--------------------------------------------------------------------------------
+331776        0x51000         PDF document, version: "1.6"
+332871        0x51447         JPEG image data, JFIF standard 1.01
+335981        0x5206D         Uncompressed Adobe Flash SWF file, Version 22, File size (header included) 84593874
+1374410       0x14F8CA        JPEG image data, JFIF standard 1.01
+2476285       0x25C8FD        JPEG image data, JFIF standard 1.01
+3126661       0x2FB585        JPEG image data, JFIF standard 1.01
+4493312       0x449000        Zip archive data, at least v2.0 to extract, compressed size: 139, uncompressed size: 189, name: app.config
+4493491       0x4490B3        Zip archive data, at least v2.0 to extract, compressed size: 128, uncompressed size: 128, name: lock1.txt
+4493658       0x44915A        Zip archive data, at least v2.0 to extract, compressed size: 128, uncompressed size: 128, name: lock2.txt
+4493825       0x449201        Zip archive data, at least v2.0 to extract, compressed size: 34427, uncompressed size: 77824, name: Start The Quiz.exe
+4528300       0x4518AC        Zip archive data, at least v2.0 to extract, compressed size: 14, uncompressed size: 14, name: submitted.txt
+4528646       0x451A06        End of Zip archive, footer length: 22
+4542464       0x455000        JPEG image data, EXIF standard
+4542476       0x45500C        TIFF image data, big-endian, offset of first image directory: 8
+4553353       0x457A89        Copyright string: "Copyright (c) 1998 Hewlett-Packard Company"
+4706304       0x47D000        PDF document, version: "1.7"
+5623808       0x55D000        JPEG image data, JFIF standard 1.01
+6115328       0x5D5000        JPEG image data, JFIF standard 1.01
+6122548       0x5D6C34        TIFF image data, little-endian offset of first image directory: 8
+6122976       0x5D6DE0        Copyright string: "copyright."
+6128520       0x5D8388        Copyright string: "Copyright (c) 1998 Hewlett-Packard Company"
+6133269       0x5D9615        Copyright string: "CopyrightFlag="true" photoshop:ColorMode="3" photoshop:ICCProfile="sRGB IEC61966-2.1" xmpMM:DocumentID="adobe:docid:photoshop:37"
+6137525       0x5DA6B5        Copyright string: "copyright.&lt;/rdf:li&gt; &lt;/rdf:Alt&gt; &lt;/dc:rights&gt; &lt;dc:description&gt; &lt;rdf:Alt&gt; &lt;rdf:li xml:lang="x-default"&gt;Forensic experts takes a sam"
+
+</code></pre></div></div>
+
+<p>We can open this Partition in FTK Imager or Autopsy, but for our ease we decided to use <code class="highlighter-rouge">foremost</code> which does the job perfectly.</p>
+
+<p>Going through the files, we have this.</p>
+
+<p><img src="/assets/img/AR/lonley.jpg" alt="" /></p>
+
+<h1 id="murder-on-the-orient-express">Murder on the Orient Express</h1>
+
+<p>We are given two jpeg files <code class="highlighter-rouge">Ready.jpeg</code> &amp; <code class="highlighter-rouge">Steady.jpeg</code></p>
+
+<p><img src="/assets/img/AR/Ready.jpeg" alt="" /></p>
+
+<p><img src="/assets/img/AR/Steady.jpeg" alt="" /></p>
+
+<p>Running <code class="highlighter-rouge">binwalk</code> on Ready.jpeg we get this</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>DECIMAL       HEXADECIMAL     DESCRIPTION
+--------------------------------------------------------------------------------
+0             0x0             JPEG image data, JFIF standard 1.01
+9264          0x2430          Zip archive data, at least v2.0 to extract, compressed size: 346, uncompressed size: 1312, name: [Content_Types].xml
+10179         0x27C3          Zip archive data, at least v2.0 to extract, compressed size: 239, uncompressed size: 590, name: _rels/.rels
+10979         0x2AE3          Zip archive data, at least v2.0 to extract, compressed size: 1118, uncompressed size: 4708, name: word/document.xml
+12144         0x2F70          Zip archive data, at least v2.0 to extract, compressed size: 244, uncompressed size: 817, name: word/_rels/document.xml.rels
+12710         0x31A6          Zip archive data, at least v2.0 to extract, compressed size: 1746, uncompressed size: 8393, name: word/theme/theme1.xml
+14507         0x38AB          Zip archive data, at least v2.0 to extract, compressed size: 1025, uncompressed size: 2845, name: word/settings.xml
+15579         0x3CDB          Zip archive data, at least v2.0 to extract, compressed size: 2931, uncompressed size: 29216, name: word/styles.xml
+18555         0x487B          Zip archive data, at least v2.0 to extract, compressed size: 295, uncompressed size: 655, name: word/webSettings.xml
+18900         0x49D4          Zip archive data, at least v2.0 to extract, compressed size: 451, uncompressed size: 1419, name: word/fontTable.xml
+19399         0x4BC7          Zip archive data, at least v2.0 to extract, compressed size: 378, uncompressed size: 765, name: docProps/core.xml
+20088         0x4E78          Zip archive data, at least v2.0 to extract, compressed size: 469, uncompressed size: 984, name: docProps/app.xml
+21572         0x5444          End of Zip archive, footer length: 22
+
+
+</code></pre></div></div>
+
+<p>Analysing more we find that its a docx file, Opening it in word gives this.</p>
+
+<p><img src="/assets/img/AR/doc1.PNG" alt="" /></p>
+
+<p>Even though it looks like a flag, it is not. It says that is a password for the next file.</p>
+
+<p>Running binwalk on the next file, we have.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@c0dbat:~/CTF/ARSEC/Murder on the Orient Express/blog# binwalk Steady.jpeg 
+
+DECIMAL       HEXADECIMAL     DESCRIPTION
+--------------------------------------------------------------------------------
+0             0x0             JPEG image data, JFIF standard 1.01
+30            0x1E            TIFF image data, little-endian offset of first image directory: 8
+36048         0x8CD0          RAR archive data, version 5.x
+
+
+</code></pre></div></div>
+<p>The seems to be a RAR archive embedded.</p>
+
+<p>Opening the archive we see that its Password Protected.</p>
+
+<p><img src="/assets/img/AR/doc2.PNG" alt="" /></p>
+
+<p>Using <code class="highlighter-rouge">AR-FRC@ARSECFOR2019</code> doesn’t seem to work, so using just <code class="highlighter-rouge">AR-FRC</code> extracted these files successfully.</p>
+
+<p>Opening the pdf file we have the flag.</p>
+
+<p><img src="/assets/img/AR/doc3.PNG" alt="" /></p>
+
+<p>Flag :<code class="highlighter-rouge">1Nv3$71G@710N_$7@r7@ARSECFOR2019</code></p>
+
+<h1 id="bloody-murder">Bloody Murder</h1>
+
+<p>We are given a file named <code class="highlighter-rouge">huehue.raw</code>. Running <code class="highlighter-rouge">file</code> against it we get:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>root@c0dbat:~/CTF/ARSEC/Bloody Murder/Bloody Murder# file huehue.raw 
+huehue.raw: RFC 822 mail, ASCII text, with very long lines
+</code></pre></div></div>
+<p>Opening this is hex editor we see this</p>
+
+<p><img src="/assets/img/AR/b1.PNG" alt="" /></p>
+
+<p>We see a file <code class="highlighter-rouge">hah</code> with base64 encoded contents, we can manually decode this.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>echo "Y3VydgAAAAAAAAQAAAAABQAKAA8AFAAZAB4AIwAoAC0AMgA3ADsAQABFAEoATwBUAFkAXgBjAGgAbQByAHcAfACBAIYAiwCQAJUAmgCfAKQAqQCuALIAtwC8AMEAxgDLANAA1QDbAOAA5QDrAPAA9gD7AQEBBwENARMBGQEfASUBKwEyATgBPgFFAUwBUgFZAWABZwFuAXUBfAGDAYsBkgGaAaEBqQGxAbkBwQHJAdEB2QHhAekB8gH6AgMCDAIUAh0CJgIvAjgCQQJLAlQCXQJnAnECegKEAo4CmAKiAqwCtgLBAssC1QLgAusC9QMAAwsDFgMhAy0DOANDA08DWgNmA3IDfgOKA5YDogOuA7oDxwPTA+AD7AP5BAYEEwQgBC0EOwRIBFUEYwRxBH4EjASaBKgEtgTEBNME4QTwBP4FDQUcBSsFOgVJBVgFZwV3BYYFlgWmBbUFxQXVBeUF9gYGBhYGJwY3BkgGWQZqBnsGjAadBq8GwAbRBuMG9QcHBxkHKwc9B08HYQd0B4YHmQesB78H0gflB/gICwgfCDIIRghaCG4IggiWCKoIvgjSCOcI+wkQCSUJOglPCWQJeQmPCaQJugnPCeUJ+woRCicKPQpUCmoKgQqYCq4KxQrcCvMLCwsiCzkLUQtpC4ALmAuwC8gL4Qv5DBIMKgxDDFwMdQyODKcMwAzZDPMNDQ0mDUANWg10DY4NqQ3DDd4N+A4TDi4OSQ5kDn8Omw62DtIO7g8JDyUPQQ9eD3oPlg+zD88P7BAJECYQQxBhEH4QmxC5ENcQ9RETETERTxFtEYwRqhHJEegSBxImEkUSZBKEEqMSwxLjEwMTIxNDE2MTgxOkE8UT5RQGFCcUSRRqFIsUrRTOFPAVEhU0FVYVeBWbFb0V4BYDFiYWSRZsFo8WshbWFvoXHRdBF2UXiReuF9IX9xgbGEAYZRiKGK8Y1Rj6GSAZRRlrGZEZtxndGgQaKhpRGncanhrFGuwbFBs7G2MbihuyG9ocAhwqHFIcexyjHMwc9R0eHUcdcB2ZHcMd7B4WHkAeah6UHr4e6R8THz4faR+UH78f6iAVIEEgbCCYIMQg8CEcIUghdSGhIc4h+yInIlUigiKvIt0jCiM4I2YjlCPCI/AkHyRNJHwkqyTaJQklOCVoJZclxyX3JicmVyaHJrcm6CcYJ0kneierJ9woDSg/KHEooijUKQYpOClrKZ0p0CoCKjUqaCqbKs8rAis2K2krnSvRLAUsOSxuLKIs1y0MLUEtdi2rLeEuFi5MLoIuty7uLyQvWi+RL8cv/jA1MGwwpDDbMRIxSjGCMbox8jIqMmMymzLUMw0zRjN/M7gz8TQrNGU0njTYNRM1TTWHNcI1/TY3NnI2rjbpNyQ3YDecN9c4FDhQOIw4yDkFOUI5fzm8Ofk6Njp0OrI67zstO2s7qjvoPCc8ZTykPOM9Ij1hPaE94D4gPmA+oD7gPyE/YT+iP+JAI0BkQKZA50EpQWpBrEHuQjBCckK1QvdDOkN9Q8BEA0RHRIpEzkUSRVVFmkXeRiJGZ0arRvBHNUd7R8BIBUhLSJFI10kdSWNJqUnwSjdKfUrESwxLU0uaS+JMKkxyTLpNAk1KTZNN3E4lTm5Ot08AT0lPk0/dUCdQcVC7UQZRUFGbUeZSMVJ8UsdTE1NfU6pT9lRCVI9U21UoVXVVwlYPVlxWqVb3V0RXklfgWC9YfVjLWRpZaVm4WgdaVlqmWvVbRVuVW+VcNVyGXNZdJ114XcleGl5sXr1fD19hX7NgBWBXYKpg/GFPYaJh9WJJYpxi8GNDY5dj62RAZJRk6WU9ZZJl52Y9ZpJm6Gc9Z5Nn6Wg/aJZo7GlDaZpp8WpIap9q92tPa6dr/2xXbK9tCG1gbbluEm5rbsRvHm94b9FwK3CGcOBxOnGVcfByS3KmcwFzXXO4dBR0cHTMdSh1hXXhdj52m3b4d1Z3s3gReG54zHkqeYl553pGeqV7BHtje8J8IXyBfOF9QX2hfgF+Yn7CfyN/hH/lgEeAqIEKgWuBzYIwgpKC9INXg7qEHYSAhOOFR4Wrhg6GcobXhzuHn4gEiGmIzokziZmJ/opkisqLMIuWi/yMY4zKjTGNmI3/jmaOzo82j56QBpBukNaRP5GokhGSepLjk02TtpQglIqU9JVflcmWNJaflwqXdZfgmEyYuJkkmZCZ/JpomtWbQpuvnByciZz3nWSd0p5Anq6fHZ+Ln/qgaaDYoUehtqImopajBqN2o+akVqTHpTilqaYapoum/adup+CoUqjEqTepqaocqo+rAqt1q+msXKzQrUStuK4trqGvFq+LsACwdbDqsWCx1rJLssKzOLOutCW0nLUTtYq2AbZ5tvC3aLfguFm40blKucK6O7q1uy67p7whvJu9Fb2Pvgq+hL7/v3q/9cBwwOzBZ8Hjwl/C28NYw9TEUcTOxUvFyMZGxsPHQce/yD3IvMk6ybnKOMq3yzbLtsw1zLXNNc21zjbOts83z7jQOdC60TzRvtI/0sHTRNPG1EnUy9VO1dHWVdbY11zX4Nhk2OjZbNnx2nba+9uA3AXcit0Q3ZbeHN6i3ynfr+A24L3hROHM4lPi2+Nj4+vkc+T85YTmDeaW5x/nqegy6LzpRunQ6lvq5etw6/vshu0R7ZzuKO6070DvzPBY8OXxcvH/8ozzGfOn9DT0wvVQ9d72bfb794r4Gfio+Tj5x/pX+uf7d/wH/Jj9Kf26/kv+3P9t//8=" | base64 -d
+</code></pre></div></div>
+<p>Viewing the contents of the decoded file, it looks like it has been encoded.</p>
+
+<p>Remember the file name was huehue.. so we try to decode this using UUencoding.</p>
+
+<p>We get a zip file, extracting the zip file we get the flag.</p>
+
+<p><img src="/assets/img/AR/flag.jpeg" alt="" /></p>
+
+
+</div>
+
+
+
+
+
+<div class="related">
+  <h2>Related Posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2019/08/15/stego-techniques.html">
+            Defeating steganography techniques in war games
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2017/11/06/xor-decrypt.html">
+            xor decrypt
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+  
+  <h2>All Tags</h2>
+  <div class="tag-cloud"><a href="/blog/tag/ctf/" class="set-5">CTF</a> <a href="/blog/tag/forensic/" class="set-1">Forensic</a> <a href="/blog/tag/ransomware/" class="set-1">ransomware</a> <a href="/blog/tag/stego/" class="set-1">stego</a> <a href="/blog/tag/xor/" class="set-1">xor</a></div>
+  
+
+
+
+      </div>
+    </main><footer class="site-footer">
+  <div class="wrapper">
+    <div class="credits">thanks to <a href="https://github.com/bitbrain">bitbrain</a> for the theme <i class="fas fa-heart"></i><div class="toggleWrapper">
+    <input type="checkbox" class="dn" id="theme-toggle" onclick="modeSwitcher()" checked />
+    <label for="theme-toggle" class="toggle">
+    <span class="toggle__handler">
+      <span class="crater crater--1"></span>
+      <span class="crater crater--2"></span>
+      <span class="crater crater--3"></span>
+    </span>
+        <span class="star star--1"></span>
+        <span class="star star--2"></span>
+        <span class="star star--3"></span>
+        <span class="star star--4"></span>
+        <span class="star star--5"></span>
+        <span class="star star--6"></span>
+    </label>
+</div>
+<script type="text/javascript">
+const theme = localStorage.getItem('theme');
+if (theme === "dark") {
+	document.documentElement.setAttribute('data-theme', 'dark');
+}
+const userPrefers = getComputedStyle(document.documentElement).getPropertyValue('content');
+
+if (theme === "dark") {
+    document.getElementById('theme-toggle').checked = true;
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.documentElement.classList.add('theme--dark');
+    document.documentElement.classList.remove('theme--light');
+	document.getElementById("theme-toggle").className = 'light';
+} else if (theme === "light") {
+    document.getElementById('theme-toggle').checked = false;
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.documentElement.classList.add('theme--light');
+    document.documentElement.classList.remove('theme--dark');
+	document.getElementById("theme-toggle").className = 'dark';
+} else if  (userPrefers === "dark") {
+    document.getElementById('theme-toggle').checked = false;
+    document.documentElement.setAttribute('data-theme', 'dark');
+	document.documentElement.classList.add('theme--dark');
+    document.documentElement.classList.remove('theme--light');
+	window.localStorage.setItem('theme', 'dark');
+	document.getElementById("theme-toggle").className = 'light';
+} else {
+    document.getElementById('theme-toggle').checked = true;
+    document.documentElement.setAttribute('data-theme', 'light');
+	document.documentElement.classList.add('theme--light');
+    document.documentElement.classList.remove('theme--dark');
+	window.localStorage.setItem('theme', 'light');
+	document.getElementById("theme-toggle").className = 'dark';
+}
+
+function modeSwitcher() {
+	let currentMode = document.documentElement.getAttribute('data-theme');
+	if (currentMode === "dark") {
+	    document.documentElement.setAttribute('data-theme', 'light');
+		document.documentElement.classList.add('theme--light');
+        document.documentElement.classList.remove('theme--dark');
+		window.localStorage.setItem('theme', 'light');
+	    document.getElementById("theme-toggle").className = 'dark';
+	} else {
+	    document.documentElement.setAttribute('data-theme', 'dark');
+		document.documentElement.classList.add('theme--dark');
+        document.documentElement.classList.remove('theme--light');
+		window.localStorage.setItem('theme', 'dark');
+	    document.getElementById("theme-toggle").className = 'light';
+	}
+}
+</script></div>
+  </div>
+</footer>
+
+
+<script>
+      window.FontAwesomeConfig = {
+        searchPseudoElements: true
+      }
+    </script>
+  </body>
+
+</html>

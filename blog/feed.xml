@@ -1,4 +1,259 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/blog/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/blog/" rel="alternate" type="text/html" /><updated>2019-09-16T05:21:54-04:00</updated><id>http://localhost:4000/blog/feed.xml</id><title type="html">jojo</title><subtitle></subtitle><author><name>hains jojo</name></author><entry><title type="html">Defeating steganography techniques in war games</title><link href="http://localhost:4000/blog/2019/08/15/stego-techniques.html" rel="alternate" type="text/html" title="Defeating steganography techniques in war games" /><published>2019-08-15T00:00:00-04:00</published><updated>2019-08-15T00:00:00-04:00</updated><id>http://localhost:4000/blog/2019/08/15/stego-techniques</id><content type="html" xml:base="http://localhost:4000/blog/2019/08/15/stego-techniques.html">&lt;h1 id=&quot;table-of-contents&quot;&gt;Table of contents&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/blog/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/blog/" rel="alternate" type="text/html" /><updated>2019-10-05T08:08:29-04:00</updated><id>http://localhost:4000/blog/feed.xml</id><title type="html">jojo</title><subtitle></subtitle><author><name>Hains Jojo</name></author><entry><title type="html">Augmented Reality Security &amp;amp; Forensic Competition 2019</title><link href="http://localhost:4000/blog/2019/10/04/AR-2019.html" rel="alternate" type="text/html" title="Augmented Reality Security &amp; Forensic Competition 2019" /><published>2019-10-04T00:00:00-04:00</published><updated>2019-10-04T00:00:00-04:00</updated><id>http://localhost:4000/blog/2019/10/04/AR-2019</id><content type="html" xml:base="http://localhost:4000/blog/2019/10/04/AR-2019.html">&lt;h1 id=&quot;line-of-duty&quot;&gt;Line Of Duty&lt;/h1&gt;
+&lt;p&gt;In this challenge we are given a JPG image of Pablo Escobar. Viewing the metadata doesn’t give us anything interesting.&lt;/p&gt;
+
+&lt;p&gt;Running &lt;code class=&quot;highlighter-rouge&quot;&gt;strings&lt;/code&gt; against it we get this.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Z_ie
+{cco6
+on 6
+o`&amp;gt;E
+y4Q@
+FLAG .txt
+FLAG .txt
+~Sz5p
+~Sz5p
+Murder!
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We see &lt;code class=&quot;highlighter-rouge&quot;&gt;FLAG .txt&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;Murder!&lt;/code&gt;.. this could be a potential password.&lt;/p&gt;
+
+&lt;p&gt;Since we saw &lt;code class=&quot;highlighter-rouge&quot;&gt;FLAG .txt&lt;/code&gt; embedded in the JPG, we go through the file using &lt;code class=&quot;highlighter-rouge&quot;&gt;binwalk&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;DECIMAL       HEXADECIMAL     DESCRIPTION
+--------------------------------------------------------------------------------
+0             0x0             JPEG image data, JFIF standard 1.01
+198477        0x3074D         Zip archive data, encrypted at least v2.0 to extract, compressed size: 60, uncompressed size: 32, name: FLAG .txt
+198705        0x30831         End of Zip archive, footer length: 22
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;We can extract the Zip archive using &lt;code class=&quot;highlighter-rouge&quot;&gt;binwalk -e&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;foremost&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Extracting the zip file using the password &lt;code class=&quot;highlighter-rouge&quot;&gt;Murder!&lt;/code&gt; we got from &lt;code class=&quot;highlighter-rouge&quot;&gt;strings&lt;/code&gt; we have a text file named &lt;code class=&quot;highlighter-rouge&quot;&gt;FLAG .txt&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Viewing the contents of the file.&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;YOU CANT CATCH ME! &quot;P4BL0#C0BAR&quot;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;P4BL0#C0BAR&lt;/code&gt; looks like a potential key.&lt;/p&gt;
+
+&lt;p&gt;Now we try to extract contents from the inital JPG using this key.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@c0dbat:~/CTF/ARSEC/Line of Duty/Line of Duty/blog# steghide extract -sf Line\ of\ Duty.jpg -p P4BL0#C0BAR
+wrote extracted data to &quot;steganopayload6903.txt&quot;.
+root@c0dbat:~/CTF/ARSEC/Line of Duty/Line of Duty/blog# cat steganopayload6903.txt 
+H3YTH3R3P33P5@ARSECFOR2019
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;We have the flag &lt;code class=&quot;highlighter-rouge&quot;&gt;H3YTH3R3P33P5@ARSECFOR2019&lt;/code&gt;.&lt;/p&gt;
+
+&lt;h1 id=&quot;a-game-of-shadows&quot;&gt;A Game Of Shadows&lt;/h1&gt;
+
+&lt;p&gt;We are given a html file which opens to look like this.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/AR/html_p.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Looking at the source of the file.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/AR/html_2.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;we get the string &lt;code class=&quot;highlighter-rouge&quot;&gt;NB2HI4DTHIXS62LNM52XELTDN5WS6NKKGJCG4OBS&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Since the heading of the html file was &lt;code class=&quot;highlighter-rouge&quot;&gt;BeepBeep32One&lt;/code&gt; we try to decode it using &lt;code class=&quot;highlighter-rouge&quot;&gt;base32&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/AR/html_3.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We get an image url, going to this url we find the flag.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://imgur.com/5J2Dn82&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;shutter-island&quot;&gt;Shutter Island&lt;/h1&gt;
+
+&lt;p&gt;This challenge is based on Audio Steganography.. We are given 2 audio files named &lt;code class=&quot;highlighter-rouge&quot;&gt;araudiosteg1&lt;/code&gt; &amp;amp; &lt;code class=&quot;highlighter-rouge&quot;&gt;araudiosteg2&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;Opening both the files in Audacity, we get this.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/AR/audio1.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Listening to the sound, it is almost inaudiable, so we decided to view the spectogram of these files.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/AR/audio2.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;First file &lt;code class=&quot;highlighter-rouge&quot;&gt;araudiosteg1&lt;/code&gt; gives this:&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;Remember this “listen”&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Second file &lt;code class=&quot;highlighter-rouge&quot;&gt;araudiosteg2&lt;/code&gt; gives this:&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;look closer&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;listen&lt;/code&gt; could be a potential password but where do we use it?&lt;/p&gt;
+
+&lt;p&gt;Running binwalk on the second audio file.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+DECIMAL       HEXADECIMAL     DESCRIPTION
+--------------------------------------------------------------------------------
+441188        0x6BB64         JPEG image data, JFIF standard 1.01
+
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;We see that there is a hidden JPEG image in it. We extracted this image using &lt;code class=&quot;highlighter-rouge&quot;&gt;foremost&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/AR/shutter.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We extracted the hidden text using &lt;code class=&quot;highlighter-rouge&quot;&gt;steghide&lt;/code&gt; and password as &lt;code class=&quot;highlighter-rouge&quot;&gt;listen&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;steghide extract -sf shutter.jpg -p &quot;listen&quot;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;We get a text file that contains the flag.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;n0w_y0u_s33_me@ARSECFOR2019
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h1 id=&quot;criminal-minds&quot;&gt;Criminal Minds&lt;/h1&gt;
+
+&lt;p&gt;For this challenge we are given a pcapng file.
+Opening the file with wireshark, we can see all the packets, sorting it by &lt;code class=&quot;highlighter-rouge&quot;&gt;http&lt;/code&gt; we see this.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/AR/pcap1.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We can already see the flag in the first packet, vewing the TCP stream&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/AR/pcap2.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Flag is there in the GET parameter.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;%40&lt;/code&gt; is the url encoded version of &lt;code class=&quot;highlighter-rouge&quot;&gt;@&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Changing that we have the flag:
+&lt;code class=&quot;highlighter-rouge&quot;&gt;y0u_f0und_m3@ARSECFOR2019&lt;/code&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;the-lonely-witness&quot;&gt;The Lonely Witness&lt;/h1&gt;
+
+&lt;p&gt;We are given a file named &lt;code class=&quot;highlighter-rouge&quot;&gt;Crack-it.jpeg&lt;/code&gt;.
+Viewing the magic numbers we can see that it is definitely not a jpeg file.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@c0dbat:~/CTF/ARSEC/The Lonely Witness/The Lonely Witness# file Crack-it\ .jpeg 
+Crack-it .jpeg: DOS/MBR boot sector MS-MBR,D0S version 3.3-7.0 english at offset 0x8b &quot;Invalid partition table&quot; at offset 0xa3 &quot;Error loading operating system&quot; at offset 0xc2 &quot;Missing operating system&quot;, disk signature 0xa0baba; partition 1 : ID=0x6, active, start-CHS (0x0,1,1), end-CHS (0x3ff,1,63), startsector 64, 1966016 sectors
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Viewing the contents using binwalk.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@c0dbat:~/CTF/ARSEC/The Lonely Witness/The Lonely Witness# binwalk Crack-it\ .jpeg 
+
+DECIMAL       HEXADECIMAL     DESCRIPTION
+--------------------------------------------------------------------------------
+331776        0x51000         PDF document, version: &quot;1.6&quot;
+332871        0x51447         JPEG image data, JFIF standard 1.01
+335981        0x5206D         Uncompressed Adobe Flash SWF file, Version 22, File size (header included) 84593874
+1374410       0x14F8CA        JPEG image data, JFIF standard 1.01
+2476285       0x25C8FD        JPEG image data, JFIF standard 1.01
+3126661       0x2FB585        JPEG image data, JFIF standard 1.01
+4493312       0x449000        Zip archive data, at least v2.0 to extract, compressed size: 139, uncompressed size: 189, name: app.config
+4493491       0x4490B3        Zip archive data, at least v2.0 to extract, compressed size: 128, uncompressed size: 128, name: lock1.txt
+4493658       0x44915A        Zip archive data, at least v2.0 to extract, compressed size: 128, uncompressed size: 128, name: lock2.txt
+4493825       0x449201        Zip archive data, at least v2.0 to extract, compressed size: 34427, uncompressed size: 77824, name: Start The Quiz.exe
+4528300       0x4518AC        Zip archive data, at least v2.0 to extract, compressed size: 14, uncompressed size: 14, name: submitted.txt
+4528646       0x451A06        End of Zip archive, footer length: 22
+4542464       0x455000        JPEG image data, EXIF standard
+4542476       0x45500C        TIFF image data, big-endian, offset of first image directory: 8
+4553353       0x457A89        Copyright string: &quot;Copyright (c) 1998 Hewlett-Packard Company&quot;
+4706304       0x47D000        PDF document, version: &quot;1.7&quot;
+5623808       0x55D000        JPEG image data, JFIF standard 1.01
+6115328       0x5D5000        JPEG image data, JFIF standard 1.01
+6122548       0x5D6C34        TIFF image data, little-endian offset of first image directory: 8
+6122976       0x5D6DE0        Copyright string: &quot;copyright.&quot;
+6128520       0x5D8388        Copyright string: &quot;Copyright (c) 1998 Hewlett-Packard Company&quot;
+6133269       0x5D9615        Copyright string: &quot;CopyrightFlag=&quot;true&quot; photoshop:ColorMode=&quot;3&quot; photoshop:ICCProfile=&quot;sRGB IEC61966-2.1&quot; xmpMM:DocumentID=&quot;adobe:docid:photoshop:37&quot;
+6137525       0x5DA6B5        Copyright string: &quot;copyright.&amp;lt;/rdf:li&amp;gt; &amp;lt;/rdf:Alt&amp;gt; &amp;lt;/dc:rights&amp;gt; &amp;lt;dc:description&amp;gt; &amp;lt;rdf:Alt&amp;gt; &amp;lt;rdf:li xml:lang=&quot;x-default&quot;&amp;gt;Forensic experts takes a sam&quot;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We can open this Partition in FTK Imager or Autopsy, but for our ease we decided to use &lt;code class=&quot;highlighter-rouge&quot;&gt;foremost&lt;/code&gt; which does the job perfectly.&lt;/p&gt;
+
+&lt;p&gt;Going through the files, we have this.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/AR/lonley.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;murder-on-the-orient-express&quot;&gt;Murder on the Orient Express&lt;/h1&gt;
+
+&lt;p&gt;We are given two jpeg files &lt;code class=&quot;highlighter-rouge&quot;&gt;Ready.jpeg&lt;/code&gt; &amp;amp; &lt;code class=&quot;highlighter-rouge&quot;&gt;Steady.jpeg&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/AR/Ready.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/AR/Steady.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Running &lt;code class=&quot;highlighter-rouge&quot;&gt;binwalk&lt;/code&gt; on Ready.jpeg we get this&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;DECIMAL       HEXADECIMAL     DESCRIPTION
+--------------------------------------------------------------------------------
+0             0x0             JPEG image data, JFIF standard 1.01
+9264          0x2430          Zip archive data, at least v2.0 to extract, compressed size: 346, uncompressed size: 1312, name: [Content_Types].xml
+10179         0x27C3          Zip archive data, at least v2.0 to extract, compressed size: 239, uncompressed size: 590, name: _rels/.rels
+10979         0x2AE3          Zip archive data, at least v2.0 to extract, compressed size: 1118, uncompressed size: 4708, name: word/document.xml
+12144         0x2F70          Zip archive data, at least v2.0 to extract, compressed size: 244, uncompressed size: 817, name: word/_rels/document.xml.rels
+12710         0x31A6          Zip archive data, at least v2.0 to extract, compressed size: 1746, uncompressed size: 8393, name: word/theme/theme1.xml
+14507         0x38AB          Zip archive data, at least v2.0 to extract, compressed size: 1025, uncompressed size: 2845, name: word/settings.xml
+15579         0x3CDB          Zip archive data, at least v2.0 to extract, compressed size: 2931, uncompressed size: 29216, name: word/styles.xml
+18555         0x487B          Zip archive data, at least v2.0 to extract, compressed size: 295, uncompressed size: 655, name: word/webSettings.xml
+18900         0x49D4          Zip archive data, at least v2.0 to extract, compressed size: 451, uncompressed size: 1419, name: word/fontTable.xml
+19399         0x4BC7          Zip archive data, at least v2.0 to extract, compressed size: 378, uncompressed size: 765, name: docProps/core.xml
+20088         0x4E78          Zip archive data, at least v2.0 to extract, compressed size: 469, uncompressed size: 984, name: docProps/app.xml
+21572         0x5444          End of Zip archive, footer length: 22
+
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Analysing more we find that its a docx file, Opening it in word gives this.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/AR/doc1.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Even though it looks like a flag, it is not. It says that is a password for the next file.&lt;/p&gt;
+
+&lt;p&gt;Running binwalk on the next file, we have.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@c0dbat:~/CTF/ARSEC/Murder on the Orient Express/blog# binwalk Steady.jpeg 
+
+DECIMAL       HEXADECIMAL     DESCRIPTION
+--------------------------------------------------------------------------------
+0             0x0             JPEG image data, JFIF standard 1.01
+30            0x1E            TIFF image data, little-endian offset of first image directory: 8
+36048         0x8CD0          RAR archive data, version 5.x
+
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;The seems to be a RAR archive embedded.&lt;/p&gt;
+
+&lt;p&gt;Opening the archive we see that its Password Protected.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/AR/doc2.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Using &lt;code class=&quot;highlighter-rouge&quot;&gt;AR-FRC@ARSECFOR2019&lt;/code&gt; doesn’t seem to work, so using just &lt;code class=&quot;highlighter-rouge&quot;&gt;AR-FRC&lt;/code&gt; extracted these files successfully.&lt;/p&gt;
+
+&lt;p&gt;Opening the pdf file we have the flag.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/AR/doc3.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Flag :&lt;code class=&quot;highlighter-rouge&quot;&gt;1Nv3$71G@710N_$7@r7@ARSECFOR2019&lt;/code&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;bloody-murder&quot;&gt;Bloody Murder&lt;/h1&gt;
+
+&lt;p&gt;We are given a file named &lt;code class=&quot;highlighter-rouge&quot;&gt;huehue.raw&lt;/code&gt;. Running &lt;code class=&quot;highlighter-rouge&quot;&gt;file&lt;/code&gt; against it we get:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@c0dbat:~/CTF/ARSEC/Bloody Murder/Bloody Murder# file huehue.raw 
+huehue.raw: RFC 822 mail, ASCII text, with very long lines
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Opening this is hex editor we see this&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/AR/b1.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We see a file &lt;code class=&quot;highlighter-rouge&quot;&gt;hah&lt;/code&gt; with base64 encoded contents, we can manually decode this.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;echo &quot;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&quot; | base64 -d
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Viewing the contents of the decoded file, it looks like it has been encoded.&lt;/p&gt;
+
+&lt;p&gt;Remember the file name was huehue.. so we try to decode this using UUencoding.&lt;/p&gt;
+
+&lt;p&gt;We get a zip file, extracting the zip file we get the flag.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/AR/flag.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name>Hains Jojo</name></author><category term="Forensic" /><summary type="html">Line Of Duty In this challenge we are given a JPG image of Pablo Escobar. Viewing the metadata doesn’t give us anything interesting.</summary></entry><entry><title type="html">Defeating steganography techniques in war games</title><link href="http://localhost:4000/blog/2019/08/15/stego-techniques.html" rel="alternate" type="text/html" title="Defeating steganography techniques in war games" /><published>2019-08-15T00:00:00-04:00</published><updated>2019-08-15T00:00:00-04:00</updated><id>http://localhost:4000/blog/2019/08/15/stego-techniques</id><content type="html" xml:base="http://localhost:4000/blog/2019/08/15/stego-techniques.html">&lt;h1 id=&quot;table-of-contents&quot;&gt;Table of contents&lt;/h1&gt;
 &lt;ol&gt;
   &lt;li&gt;&lt;a href=&quot;#introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#basics&quot;&gt;Tools&lt;/a&gt;
@@ -212,8 +467,7 @@ InstanceSize
 
 &lt;p&gt;&lt;img src=&quot;/assets/img/sonicvisualizer.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://www.sonicvisualiser.org/&quot;&gt;Download here&lt;/a&gt;&lt;/p&gt;</content><author><name>hains jojo</name></author><category term="CTF" /><category term="stego" /><summary type="html">Table of contents Introduction Tools Basics JPEG Tools PNG Tools Audio Tools</summary></entry><entry><title type="html">xor decrypt</title><link href="http://localhost:4000/blog/2017/11/06/xor-decrypt.html" rel="alternate" type="text/html" title="xor decrypt" /><published>2017-11-06T00:00:00-05:00</published><updated>2017-11-06T00:00:00-05:00</updated><id>http://localhost:4000/blog/2017/11/06/xor-decrypt</id><content type="html" xml:base="http://localhost:4000/blog/2017/11/06/xor-decrypt.html">&lt;h1 id=&quot;ransompics-from-opcde&quot;&gt;RansomPics from OPCDE&lt;/h1&gt;
-&lt;p&gt;&lt;strong&gt;Points- 200&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.sonicvisualiser.org/&quot;&gt;Download here&lt;/a&gt;&lt;/p&gt;</content><author><name>Hains Jojo</name></author><category term="CTF" /><category term="stego" /><summary type="html">Table of contents Introduction Tools Basics JPEG Tools PNG Tools Audio Tools</summary></entry><entry><title type="html">xor decrypt</title><link href="http://localhost:4000/blog/2017/11/06/xor-decrypt.html" rel="alternate" type="text/html" title="xor decrypt" /><published>2017-11-06T00:00:00-05:00</published><updated>2017-11-06T00:00:00-05:00</updated><id>http://localhost:4000/blog/2017/11/06/xor-decrypt</id><content type="html" xml:base="http://localhost:4000/blog/2017/11/06/xor-decrypt.html">&lt;h1 id=&quot;ransompics-from-opcde&quot;&gt;RansomPics from OPCDE&lt;/h1&gt;
 
 &lt;p&gt;&lt;strong&gt;Description&lt;/strong&gt;&lt;/p&gt;
 &lt;blockquote&gt;
@@ -224,7 +478,7 @@ InstanceSize
 
 &lt;p&gt;For this challenge we were given a file named &lt;code class=&quot;highlighter-rouge&quot;&gt;flag_16.xng&lt;/code&gt; and also a hint was given that it was a png file.&lt;/p&gt;
 
-&lt;p&gt;As most ransomwares use simple encrypting systems lets assume that it has been xorred all over.&lt;/p&gt;
+&lt;p&gt;As most ransomwares use simple encrypting algorithms lets assume that it has been xorred all over.&lt;/p&gt;
 
 &lt;p&gt;As the file has been named &lt;code class=&quot;highlighter-rouge&quot;&gt;flag_16.xng&lt;/code&gt; lets assume that a 16 byte key is used to xor every byte of the file, and we need this key to get the original png back.&lt;/p&gt;
 
@@ -284,4 +538,4 @@ InstanceSize
 
 &lt;p&gt;Voila we got the flag.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;www.i.imgur.com/DxkHvtZ.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name>hains jojo</name></author><category term="CTF" /><category term="ransomware" /><category term="xor" /><summary type="html">RansomPics from OPCDE Points- 200</summary></entry></feed>
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/DxkHvtZ.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name>Hains Jojo</name></author><category term="CTF" /><category term="ransomware" /><category term="xor" /><summary type="html">RansomPics from OPCDE</summary></entry></feed>
