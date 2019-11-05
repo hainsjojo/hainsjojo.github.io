@@ -1,4 +1,89 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/blog/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/blog/" rel="alternate" type="text/html" /><updated>2019-10-05T08:08:29-04:00</updated><id>http://localhost:4000/blog/feed.xml</id><title type="html">jojo</title><subtitle></subtitle><author><name>Hains Jojo</name></author><entry><title type="html">Augmented Reality Security &amp;amp; Forensic Competition 2019</title><link href="http://localhost:4000/blog/2019/10/04/AR-2019.html" rel="alternate" type="text/html" title="Augmented Reality Security &amp; Forensic Competition 2019" /><published>2019-10-04T00:00:00-04:00</published><updated>2019-10-04T00:00:00-04:00</updated><id>http://localhost:4000/blog/2019/10/04/AR-2019</id><content type="html" xml:base="http://localhost:4000/blog/2019/10/04/AR-2019.html">&lt;h1 id=&quot;line-of-duty&quot;&gt;Line Of Duty&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="http://localhost:4000/blog/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/blog/" rel="alternate" type="text/html" /><updated>2019-11-04T22:30:50-05:00</updated><id>http://localhost:4000/blog/feed.xml</id><title type="html">jojo</title><subtitle></subtitle><author><name>Hains Jojo</name></author><entry><title type="html">Binary Exploitation Challenges from iCTFF 2019</title><link href="http://localhost:4000/blog/2019/11/04/Binaryictff.html" rel="alternate" type="text/html" title="Binary Exploitation Challenges from iCTFF 2019" /><published>2019-11-04T00:00:00-05:00</published><updated>2019-11-04T00:00:00-05:00</updated><id>http://localhost:4000/blog/2019/11/04/Binaryictff</id><content type="html" xml:base="http://localhost:4000/blog/2019/11/04/Binaryictff.html">&lt;h1 id=&quot;bin100&quot;&gt;Bin100&lt;/h1&gt;
+
+&lt;p&gt;We are given a PE32 executable file which when run asks user for a serial key.&lt;/p&gt;
+
+&lt;p&gt;Simply opening the file in &lt;code class=&quot;highlighter-rouge&quot;&gt;ghidra&lt;/code&gt;. We see strings given in the output including a base64 text.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/binictff/b1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Trying to decode this base64 data, we seem to get a version of the encrypted flag.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/binictff/b2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Going through the source code in ghidra, we see that the flag seems to be bit shifted.&lt;/p&gt;
+
+&lt;p&gt;Learning more about bit shifting from https://wiki.python.org/moin/BitwiseOperators.&lt;/p&gt;
+
+&lt;p&gt;We can write a small python script that would shift the contents of the encrypted flag to 1.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import base64
+cipher = '6tLo2vauZpjGYJpmvuievo7c0qTKZpxijtyK+g=='
+a = base64.b64decode(cipher)
+c = []
+for char in a:
+        c.append(chr(ord(char) &amp;gt;&amp;gt; 1))
+d = ''.join(c)
+print(&quot;Flag: &quot;+d) 
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Running this gives us the flag.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/binictff/b3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;solution-2&quot;&gt;Solution 2:&lt;/h2&gt;
+
+&lt;p&gt;If we want to want to avoid python scripting and stop worrying about the bit shift, we could decode the initial base64 just by using Cyberchef (https://gchq.github.io/CyberChef).&lt;/p&gt;
+
+&lt;p&gt;Just add &lt;code class=&quot;highlighter-rouge&quot;&gt;From Base64&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;Bit Shift Right&lt;/code&gt; options.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/binictff/b4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;bin200&quot;&gt;Bin200&lt;/h1&gt;
+
+&lt;p&gt;We are given 2 files named decryptor and flag. Viewing the contents of these two files, file ‘flag’ seems to be encrypted data, which we assume when encrypted gives us the flag we are looking for.&lt;/p&gt;
+
+&lt;p&gt;Running file command against ‘decrytor’.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/binictff/b5.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We can see that it is python 3.6 compiled. We can get the source code decompiled by using &lt;code class=&quot;highlighter-rouge&quot;&gt;uncompyle6&lt;/code&gt;. In order to do that we have to rename &lt;code class=&quot;highlighter-rouge&quot;&gt;decryptor&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;decryptor.pyc&lt;/code&gt;, essentially add a &lt;code class=&quot;highlighter-rouge&quot;&gt;.pyc&lt;/code&gt; extension.&lt;/p&gt;
+
+&lt;p&gt;Here we have the decompiled code:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/binictff/b6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Looking at this python code we see that the program asks the user for a key and simply XORes the flag in plaintext with the key…&lt;/p&gt;
+
+&lt;p&gt;Now we know that flag is encrypted using a XOR algorithm… We also know that the flag format would be uitm{….}.&lt;/p&gt;
+
+&lt;p&gt;Since we know the cipher text (flag) and plaintext (uitm{..}). We could guess the key by XORing each other.&lt;/p&gt;
+
+&lt;p&gt;To get the key, we try to give the key as &lt;code class=&quot;highlighter-rouge&quot;&gt;uitm{&lt;/code&gt;, which would be the first 5 characters of our flag.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/binictff/b7.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We get a byte array of values &lt;code class=&quot;highlighter-rouge&quot;&gt;yFk*}T@M\x18Cm\\F\x18E~Vo\x136Sfe\x18Cm\\f:&lt;/code&gt;.
+We try to do the same thing again, but this time giving the first 5 bytes of our last output which is ` yFk*}`.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/binictff/b8.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Flag: uitm{XoR_EasY_CrypT0_Iz_Easy}.&lt;/p&gt;</content><author><name>Hains Jojo</name></author><category term="CTF" /><category term="BinExp" /><category term="xor" /><summary type="html">Bin100</summary></entry><entry><title type="html">Augmented Reality Security &amp;amp; Forensic Competition 2019</title><link href="http://localhost:4000/blog/2019/10/04/AR-2019.html" rel="alternate" type="text/html" title="Augmented Reality Security &amp; Forensic Competition 2019" /><published>2019-10-04T00:00:00-04:00</published><updated>2019-10-04T00:00:00-04:00</updated><id>http://localhost:4000/blog/2019/10/04/AR-2019</id><content type="html" xml:base="http://localhost:4000/blog/2019/10/04/AR-2019.html">&lt;h1 id=&quot;table-of-contents&quot;&gt;Table of contents&lt;/h1&gt;
+&lt;ol&gt;
+  &lt;li&gt;&lt;a href=&quot;#introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#line&quot;&gt;Line Of Duty&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#shadows&quot;&gt;A Game Of Shadows&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#island&quot;&gt;Shutter Island&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#criminal&quot;&gt;Criminal Minds&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#witness&quot;&gt;The Lonely Witness&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#murder&quot;&gt;Murder on the Orient Express&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#bloody&quot;&gt;Bloody Murder&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h1 id=&quot;introduction-&quot;&gt;Introduction &lt;a name=&quot;introduction&quot;&gt;&lt;/a&gt;&lt;/h1&gt;
+
+&lt;p&gt;On 3rd October 2019, a new game was launched for APU students as a part of InfoSec day named Augmented Reality Security and Forensics competition. Our team participated in this competition that involved gathering clues from a murder scene and analyzing and dissecting them to find flags. The 10 clues were URLs which were links to files which we downloaded. From there, we tried to solve the challenges and get the flags. Our duo ended up being the champions of this competition, this is my write up for the challenges.&lt;/p&gt;
+
+&lt;h1 id=&quot;line-of-duty-&quot;&gt;Line Of Duty &lt;a name=&quot;line&quot;&gt;&lt;/a&gt;&lt;/h1&gt;
 &lt;p&gt;In this challenge we are given a JPG image of Pablo Escobar. Viewing the metadata doesn’t give us anything interesting.&lt;/p&gt;
 
 &lt;p&gt;Running &lt;code class=&quot;highlighter-rouge&quot;&gt;strings&lt;/code&gt; against it we get this.&lt;/p&gt;
@@ -43,37 +128,37 @@ H3YTH3R3P33P5@ARSECFOR2019
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;p&gt;We have the flag &lt;code class=&quot;highlighter-rouge&quot;&gt;H3YTH3R3P33P5@ARSECFOR2019&lt;/code&gt;.&lt;/p&gt;
 
-&lt;h1 id=&quot;a-game-of-shadows&quot;&gt;A Game Of Shadows&lt;/h1&gt;
+&lt;h1 id=&quot;a-game-of-shadows-&quot;&gt;A Game Of Shadows &lt;a name=&quot;shadows&quot;&gt;&lt;/a&gt;&lt;/h1&gt;
 
 &lt;p&gt;We are given a html file which opens to look like this.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/img/AR/html_p.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/AR/html_p.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Looking at the source of the file.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/img/AR/html_2.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/AR/html_2.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;we get the string &lt;code class=&quot;highlighter-rouge&quot;&gt;NB2HI4DTHIXS62LNM52XELTDN5WS6NKKGJCG4OBS&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;Since the heading of the html file was &lt;code class=&quot;highlighter-rouge&quot;&gt;BeepBeep32One&lt;/code&gt; we try to decode it using &lt;code class=&quot;highlighter-rouge&quot;&gt;base32&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/img/AR/html_3.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/AR/html_3.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;We get an image url, going to this url we find the flag.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;https://imgur.com/5J2Dn82&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;h1 id=&quot;shutter-island&quot;&gt;Shutter Island&lt;/h1&gt;
+&lt;h1 id=&quot;shutter-island-&quot;&gt;Shutter Island &lt;a name=&quot;island&quot;&gt;&lt;/a&gt;&lt;/h1&gt;
 
 &lt;p&gt;This challenge is based on Audio Steganography.. We are given 2 audio files named &lt;code class=&quot;highlighter-rouge&quot;&gt;araudiosteg1&lt;/code&gt; &amp;amp; &lt;code class=&quot;highlighter-rouge&quot;&gt;araudiosteg2&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;Opening both the files in Audacity, we get this.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/img/AR/audio1.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/AR/audio1.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Listening to the sound, it is almost inaudiable, so we decided to view the spectogram of these files.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/img/AR/audio2.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/AR/audio2.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;First file &lt;code class=&quot;highlighter-rouge&quot;&gt;araudiosteg1&lt;/code&gt; gives this:&lt;/p&gt;
 &lt;blockquote&gt;
@@ -98,7 +183,7 @@ DECIMAL       HEXADECIMAL     DESCRIPTION
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;p&gt;We see that there is a hidden JPEG image in it. We extracted this image using &lt;code class=&quot;highlighter-rouge&quot;&gt;foremost&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/img/AR/shutter.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/AR/shutter.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;We extracted the hidden text using &lt;code class=&quot;highlighter-rouge&quot;&gt;steghide&lt;/code&gt; and password as &lt;code class=&quot;highlighter-rouge&quot;&gt;listen&lt;/code&gt;.&lt;/p&gt;
 
@@ -109,16 +194,16 @@ DECIMAL       HEXADECIMAL     DESCRIPTION
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;n0w_y0u_s33_me@ARSECFOR2019
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h1 id=&quot;criminal-minds&quot;&gt;Criminal Minds&lt;/h1&gt;
+&lt;h1 id=&quot;criminal-minds-&quot;&gt;Criminal Minds &lt;a name=&quot;criminal&quot;&gt;&lt;/a&gt;&lt;/h1&gt;
 
 &lt;p&gt;For this challenge we are given a pcapng file.
 Opening the file with wireshark, we can see all the packets, sorting it by &lt;code class=&quot;highlighter-rouge&quot;&gt;http&lt;/code&gt; we see this.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/img/AR/pcap1.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/AR/pcap1.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;We can already see the flag in the first packet, vewing the TCP stream&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/img/AR/pcap2.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/AR/pcap2.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Flag is there in the GET parameter.&lt;/p&gt;
 
@@ -127,7 +212,7 @@ Opening the file with wireshark, we can see all the packets, sorting it by &lt;c
 &lt;p&gt;Changing that we have the flag:
 &lt;code class=&quot;highlighter-rouge&quot;&gt;y0u_f0und_m3@ARSECFOR2019&lt;/code&gt;&lt;/p&gt;
 
-&lt;h1 id=&quot;the-lonely-witness&quot;&gt;The Lonely Witness&lt;/h1&gt;
+&lt;h1 id=&quot;the-lonely-witness-&quot;&gt;The Lonely Witness &lt;a name=&quot;witness&quot;&gt;&lt;/a&gt;&lt;/h1&gt;
 
 &lt;p&gt;We are given a file named &lt;code class=&quot;highlighter-rouge&quot;&gt;Crack-it.jpeg&lt;/code&gt;.
 Viewing the magic numbers we can see that it is definitely not a jpeg file.&lt;/p&gt;
@@ -171,15 +256,15 @@ DECIMAL       HEXADECIMAL     DESCRIPTION
 
 &lt;p&gt;Going through the files, we have this.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/img/AR/lonley.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/AR/lonley.jpg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;h1 id=&quot;murder-on-the-orient-express&quot;&gt;Murder on the Orient Express&lt;/h1&gt;
+&lt;h1 id=&quot;murder-on-the-orient-express-&quot;&gt;Murder on the Orient Express &lt;a name=&quot;murder&quot;&gt;&lt;/a&gt;&lt;/h1&gt;
 
 &lt;p&gt;We are given two jpeg files &lt;code class=&quot;highlighter-rouge&quot;&gt;Ready.jpeg&lt;/code&gt; &amp;amp; &lt;code class=&quot;highlighter-rouge&quot;&gt;Steady.jpeg&lt;/code&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/img/AR/Ready.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/AR/Ready.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/img/AR/Steady.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/AR/Steady.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Running &lt;code class=&quot;highlighter-rouge&quot;&gt;binwalk&lt;/code&gt; on Ready.jpeg we get this&lt;/p&gt;
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;DECIMAL       HEXADECIMAL     DESCRIPTION
@@ -203,7 +288,7 @@ DECIMAL       HEXADECIMAL     DESCRIPTION
 
 &lt;p&gt;Analysing more we find that its a docx file, Opening it in word gives this.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/img/AR/doc1.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/AR/doc1.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Even though it looks like a flag, it is not. It says that is a password for the next file.&lt;/p&gt;
 
@@ -223,17 +308,17 @@ DECIMAL       HEXADECIMAL     DESCRIPTION
 
 &lt;p&gt;Opening the archive we see that its Password Protected.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/img/AR/doc2.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/AR/doc2.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Using &lt;code class=&quot;highlighter-rouge&quot;&gt;AR-FRC@ARSECFOR2019&lt;/code&gt; doesn’t seem to work, so using just &lt;code class=&quot;highlighter-rouge&quot;&gt;AR-FRC&lt;/code&gt; extracted these files successfully.&lt;/p&gt;
 
 &lt;p&gt;Opening the pdf file we have the flag.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/img/AR/doc3.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/AR/doc3.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Flag :&lt;code class=&quot;highlighter-rouge&quot;&gt;1Nv3$71G@710N_$7@r7@ARSECFOR2019&lt;/code&gt;&lt;/p&gt;
 
-&lt;h1 id=&quot;bloody-murder&quot;&gt;Bloody Murder&lt;/h1&gt;
+&lt;h1 id=&quot;bloody-murder-&quot;&gt;Bloody Murder &lt;a name=&quot;bloody&quot;&gt;&lt;/a&gt;&lt;/h1&gt;
 
 &lt;p&gt;We are given a file named &lt;code class=&quot;highlighter-rouge&quot;&gt;huehue.raw&lt;/code&gt;. Running &lt;code class=&quot;highlighter-rouge&quot;&gt;file&lt;/code&gt; against it we get:&lt;/p&gt;
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@c0dbat:~/CTF/ARSEC/Bloody Murder/Bloody Murder# file huehue.raw 
@@ -241,7 +326,7 @@ huehue.raw: RFC 822 mail, ASCII text, with very long lines
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;p&gt;Opening this is hex editor we see this&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/img/AR/b1.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/AR/b1.PNG&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;We see a file &lt;code class=&quot;highlighter-rouge&quot;&gt;hah&lt;/code&gt; with base64 encoded contents, we can manually decode this.&lt;/p&gt;
 
@@ -253,7 +338,7 @@ huehue.raw: RFC 822 mail, ASCII text, with very long lines
 
 &lt;p&gt;We get a zip file, extracting the zip file we get the flag.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/assets/img/AR/flag.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name>Hains Jojo</name></author><category term="Forensic" /><summary type="html">Line Of Duty In this challenge we are given a JPG image of Pablo Escobar. Viewing the metadata doesn’t give us anything interesting.</summary></entry><entry><title type="html">Defeating steganography techniques in war games</title><link href="http://localhost:4000/blog/2019/08/15/stego-techniques.html" rel="alternate" type="text/html" title="Defeating steganography techniques in war games" /><published>2019-08-15T00:00:00-04:00</published><updated>2019-08-15T00:00:00-04:00</updated><id>http://localhost:4000/blog/2019/08/15/stego-techniques</id><content type="html" xml:base="http://localhost:4000/blog/2019/08/15/stego-techniques.html">&lt;h1 id=&quot;table-of-contents&quot;&gt;Table of contents&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;/blog/assets/img/AR/flag.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name>Hains Jojo</name></author><category term="Forensic" /><summary type="html">Table of contents Introduction Line Of Duty A Game Of Shadows Shutter Island Criminal Minds The Lonely Witness Murder on the Orient Express Bloody Murder</summary></entry><entry><title type="html">Defeating steganography techniques in war games</title><link href="http://localhost:4000/blog/2019/08/15/stego-techniques.html" rel="alternate" type="text/html" title="Defeating steganography techniques in war games" /><published>2019-08-15T00:00:00-04:00</published><updated>2019-08-15T00:00:00-04:00</updated><id>http://localhost:4000/blog/2019/08/15/stego-techniques</id><content type="html" xml:base="http://localhost:4000/blog/2019/08/15/stego-techniques.html">&lt;h1 id=&quot;table-of-contents&quot;&gt;Table of contents&lt;/h1&gt;
 &lt;ol&gt;
   &lt;li&gt;&lt;a href=&quot;#introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#basics&quot;&gt;Tools&lt;/a&gt;

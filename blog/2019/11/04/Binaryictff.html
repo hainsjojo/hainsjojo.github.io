@@ -3,16 +3,20 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
-<title>jojo</title>
+<title>Binary Exploitation Challenges from iCTFF 2019 | jojo</title>
 <meta name="generator" content="Jekyll v3.8.6" />
-<meta property="og:title" content="jojo" />
+<meta property="og:title" content="Binary Exploitation Challenges from iCTFF 2019" />
 <meta name="author" content="Hains Jojo" />
 <meta property="og:locale" content="en_US" />
-<link rel="canonical" href="http://localhost:4000/blog/tag/xor/" />
-<meta property="og:url" content="http://localhost:4000/blog/tag/xor/" />
+<meta name="description" content="Bin100" />
+<meta property="og:description" content="Bin100" />
+<link rel="canonical" href="http://localhost:4000/blog/2019/11/04/Binaryictff.html" />
+<meta property="og:url" content="http://localhost:4000/blog/2019/11/04/Binaryictff.html" />
 <meta property="og:site_name" content="jojo" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-11-04T00:00:00-05:00" />
 <script type="application/ld+json">
-{"headline":"jojo","@type":"WebPage","url":"http://localhost:4000/blog/tag/xor/","author":{"@type":"Person","name":"Hains Jojo"},"@context":"https://schema.org"}</script>
+{"description":"Bin100","headline":"Binary Exploitation Challenges from iCTFF 2019","dateModified":"2019-11-04T00:00:00-05:00","datePublished":"2019-11-04T00:00:00-05:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/blog/2019/11/04/Binaryictff.html"},"url":"http://localhost:4000/blog/2019/11/04/Binaryictff.html","author":{"@type":"Person","name":"Hains Jojo"},"@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/blog/assets/css/style.css">
   <link rel="icon" type="image/png" href="/blog/assets/favicon.png" /><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/blog/feed.xml" title="jojo" /><script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
@@ -32,82 +36,130 @@
 
 </div>
 
-<h1 class="post-title">articles tagged with <a class="tag" href="/tag/xor/">xor</a></h1>
-  <div class="post-links">
+<div class="post">
+  <h1 class="post-title">Binary Exploitation Challenges from iCTFF 2019</h1>
   
-  
-  
-  
-  
-  
-  
-
-
-      <div class="post-link-wrapper">
-        <a href="/blog/2019/11/04/Binaryictff.html" class="post-link">Binary Exploitation Challenges from iCTFF 2019</a>
-        <div class="post-meta">
-
-          <div class="post-tags">
-              
-              <a class="tag" href="/tag/CTF/">CTF</a>
-              
-              <a class="tag" href="/tag/BinExp/">BinExp</a>
-              
-              <a class="tag" href="/tag/xor/">xor</a>
-              
-          </div>
-          
-            Nov 4, 2019
-          
-        </div>
-
-        </div>
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-
-
-      <div class="post-link-wrapper">
-        <a href="/blog/2017/11/06/xor-decrypt.html" class="post-link">xor decrypt</a>
-        <div class="post-meta">
-
-          <div class="post-tags">
-              
-              <a class="tag" href="/tag/CTF/">CTF</a>
-              
-              <a class="tag" href="/tag/ransomware/">ransomware</a>
-              
-              <a class="tag" href="/tag/xor/">xor</a>
-              
-          </div>
-          
-            Nov 6, 2017
-          
-        </div>
-
-        </div>
-  
-  
-  
-
+  <div class="post-tags">
+      
+      <a class="tag" href="/tag/CTF/">CTF</a>
+      
+      <a class="tag" href="/tag/BinExp/">BinExp</a>
+      
+      <a class="tag" href="/tag/xor/">xor</a>
+      
   </div>
   
+  <div class="post-date">Published on 04 Nov 2019</div>
+  
+  <h1 id="bin100">Bin100</h1>
+
+<p>We are given a PE32 executable file which when run asks user for a serial key.</p>
+
+<p>Simply opening the file in <code class="highlighter-rouge">ghidra</code>. We see strings given in the output including a base64 text.</p>
+
+<p><img src="/blog/assets/img/binictff/b1.png" alt="" /></p>
+
+<p>Trying to decode this base64 data, we seem to get a version of the encrypted flag.</p>
+
+<p><img src="/blog/assets/img/binictff/b2.png" alt="" /></p>
+
+<p>Going through the source code in ghidra, we see that the flag seems to be bit shifted.</p>
+
+<p>Learning more about bit shifting from https://wiki.python.org/moin/BitwiseOperators.</p>
+
+<p>We can write a small python script that would shift the contents of the encrypted flag to 1.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>import base64
+cipher = '6tLo2vauZpjGYJpmvuievo7c0qTKZpxijtyK+g=='
+a = base64.b64decode(cipher)
+c = []
+for char in a:
+        c.append(chr(ord(char) &gt;&gt; 1))
+d = ''.join(c)
+print("Flag: "+d) 
+
+</code></pre></div></div>
+<p>Running this gives us the flag.</p>
+
+<p><img src="/blog/assets/img/binictff/b3.png" alt="" /></p>
+
+<h2 id="solution-2">Solution 2:</h2>
+
+<p>If we want to want to avoid python scripting and stop worrying about the bit shift, we could decode the initial base64 just by using Cyberchef (https://gchq.github.io/CyberChef).</p>
+
+<p>Just add <code class="highlighter-rouge">From Base64</code> and <code class="highlighter-rouge">Bit Shift Right</code> options.</p>
+
+<p><img src="/blog/assets/img/binictff/b4.png" alt="" /></p>
+
+<h1 id="bin200">Bin200</h1>
+
+<p>We are given 2 files named decryptor and flag. Viewing the contents of these two files, file ‘flag’ seems to be encrypted data, which we assume when encrypted gives us the flag we are looking for.</p>
+
+<p>Running file command against ‘decrytor’.</p>
+
+<p><img src="/blog/assets/img/binictff/b5.png" alt="" /></p>
+
+<p>We can see that it is python 3.6 compiled. We can get the source code decompiled by using <code class="highlighter-rouge">uncompyle6</code>. In order to do that we have to rename <code class="highlighter-rouge">decryptor</code> to <code class="highlighter-rouge">decryptor.pyc</code>, essentially add a <code class="highlighter-rouge">.pyc</code> extension.</p>
+
+<p>Here we have the decompiled code:</p>
+
+<p><img src="/blog/assets/img/binictff/b6.png" alt="" /></p>
+
+<p>Looking at this python code we see that the program asks the user for a key and simply XORes the flag in plaintext with the key…</p>
+
+<p>Now we know that flag is encrypted using a XOR algorithm… We also know that the flag format would be uitm{….}.</p>
+
+<p>Since we know the cipher text (flag) and plaintext (uitm{..}). We could guess the key by XORing each other.</p>
+
+<p>To get the key, we try to give the key as <code class="highlighter-rouge">uitm{</code>, which would be the first 5 characters of our flag.</p>
+
+<p><img src="/blog/assets/img/binictff/b7.png" alt="" /></p>
+
+<p>We get a byte array of values <code class="highlighter-rouge">yFk*}T@M\x18Cm\\F\x18E~Vo\x136Sfe\x18Cm\\f:</code>.
+We try to do the same thing again, but this time giving the first 5 bytes of our last output which is ` yFk*}`.</p>
+
+<p><img src="/blog/assets/img/binictff/b8.png" alt="" /></p>
+
+<p>Flag: uitm{XoR_EasY_CrypT0_Iz_Easy}.</p>
+
+</div>
+
+
+
+
+
+<div class="related">
+  <h2>Related Posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/2019/10/04/AR-2019.html">
+            Augmented Reality Security & Forensic Competition 2019
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2019/08/15/stego-techniques.html">
+            Defeating steganography techniques in war games
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/2017/11/06/xor-decrypt.html">
+            xor decrypt
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</div>
+
+
 
 
   
