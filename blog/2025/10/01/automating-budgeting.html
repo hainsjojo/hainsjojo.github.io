@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Automating my budgeting with bank transaction emails | jojo</title>
+  <meta name="author" content="Hains Jojo">
+  <meta name="description" content="A small Singapore-focused budgeting dashboard built around transaction alerts.">
+  <link rel="canonical" href="https://hainsjojo.github.io/blog/2025/10/01/automating-budgeting.html">
+  <link rel="stylesheet" href="/blog/assets/css/style.css">
+  <link rel="icon" type="image/png" href="/blog/assets/favicon.png">
+  <link type="application/atom+xml" rel="alternate" href="/blog/feed.xml" title="jojo">
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="site-header">
+    <div class="wrapper">
+      <a class="site-title" rel="author" href="/blog/">jojo<b class="command_prompt"></b><b class="blinking_cursor">_</b></a>
+      <span class="social_links">
+        <a class="color-cyan-hover" href="https://twitter.com/hainsjojo"><i class="fab fa-twitter-square"></i></a>
+        <a class="color-red-hover" href="https://hainsjojo.github.io"><i class="fab fa-itch-io"></i></a>
+        <a class="color-purple-hover" href="https://github.com/hainsjojo"><i class="fab fa-github-square"></i></a>
+      </span>
+    </div>
+  </div>
+  <main class="page-content" aria-label="Content">
+    <div class="wrapper">
+      <article class="post">
+  <h1 class="post-title">Automating my budgeting with bank transaction emails</h1>
+  
+    <div class="post-tags">
+      
+        <a class="tag" href="/blog/tag/automation/">automation</a>
+      
+        <a class="tag" href="/blog/tag/budgeting/">budgeting</a>
+      
+        <a class="tag" href="/blog/tag/singapore/">singapore</a>
+      
+    </div>
+  
+  <div class="post-date">Published on Oct 01, 2025</div>
+  
+    <div class="post-description">A small Singapore-focused budgeting dashboard built around transaction alerts.</div>
+  
+  <p>I have tried a lot of ways to track spending. Spreadsheets, notes apps, bank exports, little monthly rituals where I tell myself that this is the month I become a person of discipline and categorisation.</p>
+<p>It usually lasts until the third bubble tea, the second Grab ride, or the first week where I am too tired to type <code>KOUFU - $6.50 - food</code> into a spreadsheet.</p>
+<p>The annoying part is that the data already exists. Every card tap, PayLah transfer, and bank transaction alert lands somewhere. In Singapore, especially if you use DBS, PayLah, and UOB, your spending life leaves a trail of emails and push alerts: hawker meals, MRT top-ups, subscriptions, groceries, transfers, random late-night convenience store decisions. The data is there. It is just trapped in places designed to interrupt you for three seconds, not help you understand a month.</p>
+<p>So I built a small tool to make the boring part disappear.</p>
+<h2>The idea</h2>
+<p>The first version of the idea was almost embarrassingly simple:</p>
+<ol>
+<li>Let the banks keep sending transaction alerts.</li>
+<li>Forward those alerts into one Gmail inbox.</li>
+<li>Have an app collect the emails automatically.</li>
+<li>Parse the useful bits: amount, merchant, currency, date.</li>
+<li>Put everything into a dashboard I can actually look at.</li>
+</ol>
+<p>The core bet was that I should not need to manually log daily spending. Manual tracking is fragile because it depends on mood, and my mood is not a dependable database. Automated tracking is boring in the best possible way: it just keeps happening.</p>
+<h2>Why email alerts?</h2>
+<p>There are fancier ways to build personal finance tools. Bank APIs, Open Banking integrations, scraping exports, mobile notifications, CSV imports.</p>
+<p>But for my own use, email had a very Singaporean practicality to it. DBS and UOB already send transaction alerts. Gmail filters are reliable enough. IMAP is boring and well-understood. SQLite is enough. A local Flask dashboard is enough.</p>
+<p>That was the design constraint: build something small enough that I would keep using it.</p>
+<p>The setup became a few Gmail forwarding rules:</p>
+<div class="blog-marker-list">
+  <p>&#128232; DBS iBanking alerts from <code>ibanking.alert@dbs.com</code></p>
+  <p>&#128232; DBS PayLah alerts from <code>paylah.alert@dbs.com</code></p>
+  <p>&#128232; UOB transaction alerts from <code>unialerts@uobgroup.com</code></p>
+</div>
+<p>Those get forwarded into the app's mailbox. The app connects over IMAP, fetches new messages, stores the raw email, and then parses only the transaction fields it needs.</p>
+<h2>Parsing DBS and UOB</h2>
+<p>The part I cared about most was transaction collection. If that was unreliable, the rest of the dashboard would just be decorative nonsense with nicer fonts.</p>
+<p>DBS PayLah messages have a fairly friendly structure: an amount, a <code>To:</code> line, and a date/time field. The parser can pull out <code>SGD</code>, the recipient name, and the timestamp. One small wrinkle is year handling. A message might say something like <code>01 Oct 12:32 (SGT)</code> without a year, so the parser uses the email date as the default and guards against weird future dates around year rollover.</p>
+<p>UOB card alerts are more sentence-like. They read closer to: a transaction of some amount was made on a date at some merchant. The parser looks for the amount after the transaction phrase, assumes SGD for these alerts, extracts the merchant after <code>at</code>, and uses day-first date parsing because this is Singapore and <code>23/09/25</code> is not May 9th.</p>
+<p>There is also a generic fallback parser for anything less structured. It looks for common currency forms like <code>SGD</code>, <code>S$</code>, <code>MYR</code>, <code>RM</code>, and <code>$</code>, then tries to infer a merchant from words like merchant, payee, beneficiary, <code>to</code>, or <code>at</code>.</p>
+<p>This is not grand AI. It is regex, defaults, and patience. A lot of useful automation is like that: less magic, more tiny boring decisions stacked carefully.</p>
+<h2>If you want to reuse the email parsing idea</h2>
+<p>The most reusable part of this project is not the dashboard. It is the boring ingestion loop:</p>
+<ol>
+<li>Get bank alerts into one mailbox.</li>
+<li>Fetch those emails over IMAP.</li>
+<li>Store the raw email first.</li>
+<li>Parse transactions from the stored raw email.</li>
+<li>Keep parse failures visible instead of pretending they did not happen.</li>
+</ol>
+<p>For Gmail, I used filters that forward only transaction-like emails into the mailbox used by the app. The important filters were:</p>
+<div class="blog-marker-list">
+  <p>&#128232; DBS iBanking: from <code>ibanking.alert@dbs.com</code>, with words like <code>You have received</code></p>
+  <p>&#128232; DBS PayLah: from <code>paylah.alert@dbs.com</code>, with words like <code>Transaction</code></p>
+  <p>&#128232; UOB alerts: from <code>unialerts@uobgroup.com</code>, with words like <code>A transaction of</code></p>
+</div>
+<p>On the app side, the configuration is just environment variables:</p>
+<pre><code class="language-text">EMAIL_USER=your-forwarded-mailbox@gmail.com
+EMAIL_PASS=your-app-password
+IMAP_HOST=imap.gmail.com
+IMAP_FOLDER=INBOX
+SENDERS=ibanking.alert@dbs.com,paylah.alert@dbs.com,unialerts@uobgroup.com
+DB_PATH=emails.db
+</code></pre>
+<p>The fetcher connects to IMAP, searches by sender, reads each message, extracts a plain-text body, and inserts it into an <code>emails_raw</code> table. I keep fields like UID, message ID, sender, subject, date header, body text, and a short snippet. The UID and message ID matter because you do not want the same alert imported every time the job runs.</p>
+<p>The parser then works from stored email rows, not directly from the inbox. That separation is important. If a DBS or UOB template changes later, you can update the parser and reprocess stored emails without needing to fetch them again.</p>
+<p>The parser functions return a small common shape:</p>
+<pre><code class="language-python">{
+    &quot;amount&quot;: amount,
+    &quot;currency&quot;: &quot;SGD&quot;,
+    &quot;merchant&quot;: merchant,
+    &quot;when&quot;: parsed_datetime,
+}
+</code></pre>
+<p>For DBS PayLah, the useful fields usually come from lines like <code>Amount:</code>, <code>To:</code>, and <code>Date &amp; Time:</code>. For UOB, the alert is more sentence-shaped, so the parser looks for the amount after <code>transaction of</code>, the date after <code>on</code>, and the merchant after <code>at</code>.</p>
+<p>If you want to adapt this for another Singapore bank, I would start by forwarding ten real alerts into a test mailbox, printing the plain-text body, and writing one parser per alert type. Do not try to make one magical parser for every bank immediately. A small dispatcher is easier to reason about:</p>
+<pre><code class="language-python">def dispatch(subject, body, from_addr, email_date=None):
+    if &quot;paylah&quot; in subject.lower():
+        return parse_dbspaylah(body, email_date)
+    if &quot;uob&quot; in subject.lower() or &quot;uob&quot; in from_addr.lower():
+        return parse_uob_card(body, email_date)
+    return parse_generic(subject, body, from_addr)
+</code></pre>
+<p>The last practical piece is deduplication. Forwarded alerts can overlap, and some emails are noisy. I dedupe using merchant, amount, date, and a nearby timestamp window. If parsing fails, I write a skipped row instead of retrying forever. That makes the system a bit less elegant, but much easier to operate.</p>
+<p>The rough rule is: raw emails are evidence, parsed transactions are interpretation. Keep both.</p>
+<h2>The pipeline</h2>
+<p>The app is a Flask + SQLAlchemy dashboard backed by SQLite. The flow is:</p>
+<ol>
+<li>Fetch transaction emails through IMAP.</li>
+<li>Store the raw email in an <code>emails_raw</code> table.</li>
+<li>Parse unprocessed emails into a <code>transactions</code> table.</li>
+<li>Deduplicate likely repeats by merchant, amount, date, and nearby timestamp.</li>
+<li>Apply category rules based on merchant keywords.</li>
+<li>Show the result in dashboard, merchant, category, transaction, and insight views.</li>
+</ol>
+<p>I like that the raw email is stored separately from the parsed transaction. It means the system can be wrong in a recoverable way. If a parser gets better, I can reprocess old emails instead of losing history.</p>
+<p>I also added &quot;skipped&quot; transactions for parse errors and duplicates. That sounds ugly, but it is useful. It prevents the same bad email from being retried forever, while still leaving a visible audit trail that something happened.</p>
+<h2>Categories without bookkeeping pain</h2>
+<p>The second problem after collection is categorisation.</p>
+<p>Singapore spending has patterns that generic budget apps do not always understand nicely. The same month can include hawker centres, Kopitiam, Koufu, Toast Box, Grab, Shopee, FairPrice, Giant, Cold Storage, SimplyGo, clinic visits, insurance, transfers, and investment movements. Some of those are expenses. Some are movements between pockets. Some are things I want excluded when I am asking, &quot;how much did I actually spend?&quot;</p>
+<p>I did not want to hand-edit every row, so the app uses category rules. A rule is just:</p>
+<pre><code class="language-text">merchant keyword -&gt; category
+</code></pre>
+<p>If the merchant contains <code>mcdonald</code>, put it under Food &amp; Beverage. If it contains <code>smrt</code>, put it under Transport. If it contains a brokerage or recurring investment marker, keep it away from normal spending analytics.</p>
+<p>The category page shows uncategorised merchants and lets me add rules. Once a rule exists, it can be applied to existing transactions too. This turned categorisation from a daily chore into an occasional cleanup pass.</p>
+<h2>What the dashboard tells me</h2>
+<p>Once collection became automatic, the dashboard could move beyond the blunt question of &quot;how much did I spend?&quot;</p>
+<p>The app now shows:</p>
+<div class="blog-marker-list">
+  <p>&#128202; total spend, month spend, week spend, and average daily spend</p>
+  <p>&#128202; spending over time and top merchants for the month/year</p>
+  <p>&#128202; merchant-level drilldowns and category trends</p>
+  <p>&#128202; month-over-month and year-to-date movement</p>
+  <p>&#128202; spending spikes, habit shifts, category volatility, and surprise index</p>
+  <p>&#128202; cashflow and budget snapshots</p>
+</div>
+<p>Some of these are more useful than others, but the important thing is that they are computed from real behaviour, not from what I remembered to enter on a Sunday night.</p>
+<p>That changes the feeling of budgeting. Instead of sitting down with guilt and reconstructing the past, I can open the dashboard and ask better questions:</p>
+<div class="question-list">
+  <p>&#128184; Why was Food &amp; Beverage higher this month?</p>
+  <p>&#128184; Was transport actually the problem, or did it just feel expensive?</p>
+  <p>&#128184; Which merchants quietly became recurring spend?</p>
+  <p>&#128184; Which category is volatile enough that a fixed monthly budget is unrealistic?</p>
+  <p>&#128184; How much of this month's cashflow went into expenses, rent, investments, and liquid savings?</p>
+</div>
+<h2>Claude and the shape of the tool</h2>
+<p>This was also one of those projects where AI coding tools were genuinely useful, not in a &quot;build me a startup&quot; way, but in a &quot;sit beside me while I turn this annoyance into software&quot; way.</p>
+<p>Claude was helpful early on when the problem was still fuzzy. I could describe the kind of app I wanted: &quot;read bank emails, parse transactions, show me spending by merchant and category&quot;, and use it to explore data models, parsing approaches, and dashboard ideas. It was good for the messy whiteboard stage, where the actual task is figuring out what the tool should even be.</p>
+<p>The funny thing is that the end result is not especially complicated. It is not trying to replace a finance app. It is a private, local tool that does one job well: collect the transactions I already receive and make them visible.</p>
+<h2>Privacy and tradeoffs</h2>
+<p>There are obvious privacy considerations here. Bank transaction emails are sensitive. For my setup, the app is personal and local. It reads from a dedicated mailbox, stores data in SQLite, and is meant for my own network rather than the public internet.</p>
+<p>The tradeoff is also clear: email parsing is brittle. Banks can change email templates. Merchants can be messy. Forwarding rules can miss things. Dedupe logic can be too aggressive or too loose. This is the kind of tool that needs occasional gardening.</p>
+<p>But the alternative was manual tracking, and manual tracking was already failing silently.</p>
+<p>I would rather have an imperfect automatic system that captures most of my spending than a perfect spreadsheet I stop updating after a week.</p>
+<h2>What I learned</h2>
+<p>The biggest lesson was that budgeting tools are not really about charts. Charts are the reward at the end.</p>
+<p>The actual problem is capture.</p>
+<p>If transaction capture is manual, the whole system depends on willpower. If transaction capture is automatic, the system can become part of the background. In Singapore, where a normal month can involve DBS, UOB, PayLah, card taps, QR payments, and a long tail of small merchants, automation matters more than visual polish.</p>
+<p>This tool made budgeting feel less like homework and more like observability for my own life. I do not have to remember every small transaction anymore; I can let the system collect the receipts and then look for the pattern later.</p>
+<p>That is probably the version of personal finance tracking I can live with: not a moral lecture, not a perfect ledger, just a quiet system that keeps the receipts and tells me what actually happened.</p>
+
+</article>
+
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="wrapper">
+      <div class="credits">
+        thanks to <a href="https://github.com/bitbrain">bitbrain</a> for the theme <i class="fas fa-heart"></i>
+        <div class="toggleWrapper">
+          <input type="checkbox" class="dn" id="theme-toggle" onclick="modeSwitcher()" checked>
+          <label for="theme-toggle" class="toggle">
+            <span class="toggle__handler">
+              <span class="crater crater--1"></span>
+              <span class="crater crater--2"></span>
+              <span class="crater crater--3"></span>
+            </span>
+            <span class="star star--1"></span>
+            <span class="star star--2"></span>
+            <span class="star star--3"></span>
+            <span class="star star--4"></span>
+            <span class="star star--5"></span>
+            <span class="star star--6"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="/blog/assets/js/theme.js"></script>
+  <script>window.FontAwesomeConfig = { searchPseudoElements: true };</script>
+</body>
+</html>

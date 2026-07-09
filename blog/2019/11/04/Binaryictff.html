@@ -1,55 +1,45 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en">
+<head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
-<title>Binary Exploitation Challenges from iCTFF 2019 | jojo</title>
-<meta name="generator" content="Jekyll v3.8.6" />
-<meta property="og:title" content="Binary Exploitation Challenges from iCTFF 2019" />
-<meta name="author" content="Hains Jojo" />
-<meta property="og:locale" content="en_US" />
-<meta name="description" content="Bin100" />
-<meta property="og:description" content="Bin100" />
-<link rel="canonical" href="http://localhost:4000/blog/2019/11/04/Binaryictff.html" />
-<meta property="og:url" content="http://localhost:4000/blog/2019/11/04/Binaryictff.html" />
-<meta property="og:site_name" content="jojo" />
-<meta property="og:type" content="article" />
-<meta property="article:published_time" content="2019-11-04T00:00:00-05:00" />
-<script type="application/ld+json">
-{"description":"Bin100","headline":"Binary Exploitation Challenges from iCTFF 2019","dateModified":"2019-11-04T00:00:00-05:00","datePublished":"2019-11-04T00:00:00-05:00","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/blog/2019/11/04/Binaryictff.html"},"url":"http://localhost:4000/blog/2019/11/04/Binaryictff.html","author":{"@type":"Person","name":"Hains Jojo"},"@context":"https://schema.org"}</script>
-<!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/blog/assets/css/style.css">
-  <link rel="icon" type="image/png" href="/blog/assets/favicon.png" /><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/blog/feed.xml" title="jojo" /><script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Binary Exploitation Challenges from iCTFF 2019 | jojo</title>
+  <meta name="author" content="Hains Jojo">
+  <meta name="description" content="Write-ups, notes, and experiments.">
+  <link rel="canonical" href="https://hainsjojo.github.io/blog/2019/11/04/Binaryictff.html">
+  <link rel="stylesheet" href="/blog/assets/css/style.css">
+  <link rel="icon" type="image/png" href="/blog/assets/favicon.png">
+  <link type="application/atom+xml" rel="alternate" href="/blog/feed.xml" title="jojo">
+  <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
 </head>
-<body><div class="site-header">
-  <div class="wrapper">
-    <a class="site-title" rel="author" href="/blog/">jojo<b class="command_prompt"></b><b class="blinking_cursor">_</b></a>
-    <span class="social_links">
-        <a class="color-cyan-hover" href="https://twitter.com/hainsjojo"><i class="fab fa-twitter-square"></i></a><a class="color-red-hover" href="https://hainsjojo.github.io"><i class="fab fa-itch-io"></i></a><a class="color-purple-hover" href="https://github.com/hainsjojo"><i class="fab fa-github-square"></i></a>
-    </span>
+<body>
+  <div class="site-header">
+    <div class="wrapper">
+      <a class="site-title" rel="author" href="/blog/">jojo<b class="command_prompt"></b><b class="blinking_cursor">_</b></a>
+      <span class="social_links">
+        <a class="color-cyan-hover" href="https://twitter.com/hainsjojo"><i class="fab fa-twitter-square"></i></a>
+        <a class="color-red-hover" href="https://hainsjojo.github.io"><i class="fab fa-itch-io"></i></a>
+        <a class="color-purple-hover" href="https://github.com/hainsjojo"><i class="fab fa-github-square"></i></a>
+      </span>
+    </div>
   </div>
-</div>
-<main class="page-content" aria-label="Content">
-      <div class="wrapper">
-        <div class="author-box">
-
-
-</div>
-
-<div class="post">
+  <main class="page-content" aria-label="Content">
+    <div class="wrapper">
+      <article class="post">
   <h1 class="post-title">Binary Exploitation Challenges from iCTFF 2019</h1>
   
-  <div class="post-tags">
+    <div class="post-tags">
       
-      <a class="tag" href="/tag/CTF/">CTF</a>
+        <a class="tag" href="/blog/tag/ctf/">CTF</a>
       
-      <a class="tag" href="/tag/BinExp/">BinExp</a>
+        <a class="tag" href="/blog/tag/binexp/">BinExp</a>
       
-      <a class="tag" href="/tag/xor/">xor</a>
+        <a class="tag" href="/blog/tag/xor/">xor</a>
       
-  </div>
+    </div>
   
-  <div class="post-date">Published on 04 Nov 2019</div>
+  <div class="post-date">Published on Nov 04, 2019</div>
   
   <h1 id="bin100">Bin100</h1>
 
@@ -74,7 +64,7 @@ cipher = '6tLo2vauZpjGYJpmvuievo7c0qTKZpxijtyK+g=='
 a = base64.b64decode(cipher)
 c = []
 for char in a:
-        c.append(chr(ord(char) &gt;&gt; 1))
+        c.append(chr(ord(char) >> 1))
 d = ''.join(c)
 print("Flag: "+d) 
 
@@ -122,133 +112,34 @@ We try to do the same thing again, but this time giving the first 5 bytes of our
 
 <p>Flag: uitm{XoR_EasY_CrypT0_Iz_Easy}.</p>
 
-</div>
+</article>
 
-
-
-
-
-<div class="related">
-  <h2>Related Posts</h2>
-  <ul class="related-posts">
-    
-      <li>
-        <h3>
-          <a href="/2019/10/04/AR-2019.html">
-            Augmented Reality Security & Forensic Competition 2019
-          </a>
-        </h3>
-      </li>
-    
-      <li>
-        <h3>
-          <a href="/2019/08/15/stego-techniques.html">
-            Defeating steganography techniques in war games
-          </a>
-        </h3>
-      </li>
-    
-      <li>
-        <h3>
-          <a href="/2017/11/06/xor-decrypt.html">
-            xor decrypt
-          </a>
-        </h3>
-      </li>
-    
-  </ul>
-</div>
-
-
-
-
-  
-  <h2>All Tags</h2>
-  <div class="tag-cloud"><a href="/blog/tag/binexp/" class="set-1">BinExp</a> <a href="/blog/tag/ctf/" class="set-5">CTF</a> <a href="/blog/tag/forensic/" class="set-1">Forensic</a> <a href="/blog/tag/ransomware/" class="set-1">ransomware</a> <a href="/blog/tag/stego/" class="set-1">stego</a> <a href="/blog/tag/xor/" class="set-3">xor</a></div>
-  
-
-
-
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="wrapper">
+      <div class="credits">
+        thanks to <a href="https://github.com/bitbrain">bitbrain</a> for the theme <i class="fas fa-heart"></i>
+        <div class="toggleWrapper">
+          <input type="checkbox" class="dn" id="theme-toggle" onclick="modeSwitcher()" checked>
+          <label for="theme-toggle" class="toggle">
+            <span class="toggle__handler">
+              <span class="crater crater--1"></span>
+              <span class="crater crater--2"></span>
+              <span class="crater crater--3"></span>
+            </span>
+            <span class="star star--1"></span>
+            <span class="star star--2"></span>
+            <span class="star star--3"></span>
+            <span class="star star--4"></span>
+            <span class="star star--5"></span>
+            <span class="star star--6"></span>
+          </label>
+        </div>
       </div>
-    </main><footer class="site-footer">
-  <div class="wrapper">
-    <div class="credits">thanks to <a href="https://github.com/bitbrain">bitbrain</a> for the theme <i class="fas fa-heart"></i><div class="toggleWrapper">
-    <input type="checkbox" class="dn" id="theme-toggle" onclick="modeSwitcher()" checked />
-    <label for="theme-toggle" class="toggle">
-    <span class="toggle__handler">
-      <span class="crater crater--1"></span>
-      <span class="crater crater--2"></span>
-      <span class="crater crater--3"></span>
-    </span>
-        <span class="star star--1"></span>
-        <span class="star star--2"></span>
-        <span class="star star--3"></span>
-        <span class="star star--4"></span>
-        <span class="star star--5"></span>
-        <span class="star star--6"></span>
-    </label>
-</div>
-<script type="text/javascript">
-const theme = localStorage.getItem('theme');
-if (theme === "dark") {
-	document.documentElement.setAttribute('data-theme', 'dark');
-}
-const userPrefers = getComputedStyle(document.documentElement).getPropertyValue('content');
-
-if (theme === "dark") {
-    document.getElementById('theme-toggle').checked = true;
-    document.documentElement.setAttribute('data-theme', 'dark');
-    document.documentElement.classList.add('theme--dark');
-    document.documentElement.classList.remove('theme--light');
-	document.getElementById("theme-toggle").className = 'light';
-} else if (theme === "light") {
-    document.getElementById('theme-toggle').checked = false;
-    document.documentElement.setAttribute('data-theme', 'light');
-    document.documentElement.classList.add('theme--light');
-    document.documentElement.classList.remove('theme--dark');
-	document.getElementById("theme-toggle").className = 'dark';
-} else if  (userPrefers === "dark") {
-    document.getElementById('theme-toggle').checked = false;
-    document.documentElement.setAttribute('data-theme', 'dark');
-	document.documentElement.classList.add('theme--dark');
-    document.documentElement.classList.remove('theme--light');
-	window.localStorage.setItem('theme', 'dark');
-	document.getElementById("theme-toggle").className = 'light';
-} else {
-    document.getElementById('theme-toggle').checked = true;
-    document.documentElement.setAttribute('data-theme', 'light');
-	document.documentElement.classList.add('theme--light');
-    document.documentElement.classList.remove('theme--dark');
-	window.localStorage.setItem('theme', 'light');
-	document.getElementById("theme-toggle").className = 'dark';
-}
-
-function modeSwitcher() {
-	let currentMode = document.documentElement.getAttribute('data-theme');
-	if (currentMode === "dark") {
-	    document.documentElement.setAttribute('data-theme', 'light');
-		document.documentElement.classList.add('theme--light');
-        document.documentElement.classList.remove('theme--dark');
-		window.localStorage.setItem('theme', 'light');
-	    document.getElementById("theme-toggle").className = 'dark';
-	} else {
-	    document.documentElement.setAttribute('data-theme', 'dark');
-		document.documentElement.classList.add('theme--dark');
-        document.documentElement.classList.remove('theme--light');
-		window.localStorage.setItem('theme', 'dark');
-	    document.getElementById("theme-toggle").className = 'light';
-	}
-}
-</script></div>
-  </div>
-</footer>
-
-
-<script>
-      window.FontAwesomeConfig = {
-        searchPseudoElements: true
-      }
-    </script>
-  </body>
-
+    </div>
+  </footer>
+  <script src="/blog/assets/js/theme.js"></script>
+  <script>window.FontAwesomeConfig = { searchPseudoElements: true };</script>
+</body>
 </html>

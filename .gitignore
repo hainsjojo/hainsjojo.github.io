@@ -1,0 +1,29 @@
+node_modules/
+.eleventy-cache/
+.cache/
+dist/
+_site/
+
+# Local blog source and build tooling.
+# The GitHub Pages repo should only publish the generated static files.
+.eleventy.js
+package.json
+package-lock.json
+src/
+tools/
+
+# Local environment/editor noise.
+.env
+.env.*
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.log
+*.db
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
